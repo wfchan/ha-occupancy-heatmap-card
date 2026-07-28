@@ -7,6 +7,8 @@ export interface OccupancyHeatmapCardConfig {
   entity?: string;
   title?: string;
   days?: number;
+  start_hour?: number;
+  end_hour?: number;
   mode?: HeatmapMode;
   numeric_threshold?: number;
   numeric_intensity?: NumericIntensity;
@@ -21,6 +23,8 @@ export interface NormalizedOccupancyHeatmapCardConfig {
   entity: string;
   title: string | undefined;
   days: number;
+  start_hour: number;
+  end_hour: number;
   mode: HeatmapMode;
   numeric_threshold: number;
   numeric_intensity: NumericIntensity;

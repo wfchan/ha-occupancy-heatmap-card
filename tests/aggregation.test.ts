@@ -9,6 +9,8 @@ const baseConfig: NormalizedOccupancyHeatmapCardConfig = {
   entity: "sensor.room",
   title: undefined,
   days: 1,
+  start_hour: 0,
+  end_hour: 23,
   mode: "numeric",
   numeric_threshold: 0,
   numeric_intensity: "duration",

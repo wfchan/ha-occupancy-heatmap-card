@@ -9,6 +9,18 @@ import type {
 const MODES = new Set<HeatmapMode>(["auto", "numeric", "categorical"]);
 const NUMERIC_INTENSITIES = new Set<NumericIntensity>(["duration", "value"]);
 
+function normalizeHour(
+  value: number | undefined,
+  fallback: number,
+  label: string
+): number {
+  const hour = value ?? fallback;
+  if (!Number.isInteger(hour) || hour < 0 || hour > 23) {
+    throw new Error(`${label} hour must be a whole number between 0 and 23`);
+  }
+  return hour;
+}
+
 export function normalizeConfig(
   config: OccupancyHeatmapCardConfig
 ): NormalizedOccupancyHeatmapCardConfig {
@@ -20,6 +32,12 @@ export function normalizeConfig(
   const days = config.days ?? 7;
   if (!Number.isInteger(days) || days < 1 || days > 31) {
     throw new Error("Days must be an integer between 1 and 31");
+  }
+
+  const startHour = normalizeHour(config.start_hour, 0, "Start");
+  const endHour = normalizeHour(config.end_hour, 23, "End");
+  if (startHour > endHour) {
+    throw new Error("Start hour must be less than or equal to end hour");
   }
 
   const mode = config.mode ?? "auto";
@@ -50,6 +68,8 @@ export function normalizeConfig(
     entity,
     title: config.title?.trim() || undefined,
     days,
+    start_hour: startHour,
+    end_hour: endHour,
     mode,
     numeric_threshold: threshold,
     numeric_intensity: numericIntensity,

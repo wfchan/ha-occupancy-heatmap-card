@@ -9,6 +9,8 @@ describe("normalizeConfig", () => {
       entity: "sensor.room",
       title: undefined,
       days: 7,
+      start_hour: 0,
+      end_hour: 23,
       mode: "auto",
       numeric_threshold: 0,
       numeric_intensity: "duration",
@@ -27,6 +29,31 @@ describe("normalizeConfig", () => {
     expect(() => normalizeConfig({ entity: "sensor.room", days })).toThrow(
       "Days must be an integer between 1 and 31"
     );
+  });
+
+  it("accepts an inclusive one-hour display range", () => {
+    expect(
+      normalizeConfig({ entity: "sensor.room", start_hour: 9, end_hour: 9 })
+    ).toMatchObject({ start_hour: 9, end_hour: 9 });
+  });
+
+  it.each([
+    ["start_hour", -1],
+    ["start_hour", 24],
+    ["start_hour", 9.5],
+    ["end_hour", -1],
+    ["end_hour", 24],
+    ["end_hour", 22.5],
+  ] as const)("rejects invalid %s value %s", (field, value) => {
+    expect(() => normalizeConfig({ entity: "sensor.room", [field]: value })).toThrow(
+      `${field === "start_hour" ? "Start" : "End"} hour must be a whole number between 0 and 23`
+    );
+  });
+
+  it("rejects an overnight display range", () => {
+    expect(() =>
+      normalizeConfig({ entity: "sensor.room", start_hour: 22, end_hour: 6 })
+    ).toThrow("Start hour must be less than or equal to end hour");
   });
 
   it("rejects an unsupported mode", () => {
