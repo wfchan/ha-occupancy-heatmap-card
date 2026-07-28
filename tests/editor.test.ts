@@ -19,7 +19,7 @@ const hass: HomeAssistant = {
 };
 
 describe("OccupancyHeatmapCardEditor", () => {
-  it("renders entity options when hass is assigned after the first render", async () => {
+  it("binds the entity picker when hass is assigned after the first render", async () => {
     const editor = document.createElement(
       "occupancy-heatmap-card-editor"
     ) as OccupancyHeatmapCardEditor;
@@ -27,12 +27,38 @@ describe("OccupancyHeatmapCardEditor", () => {
     document.body.append(editor);
     await editor.updateComplete;
 
-    expect(editor.shadowRoot?.querySelector("option[value='sensor.room']")).toBeNull();
+    const picker = editor.shadowRoot?.querySelector<HTMLElement>("ha-entity-picker");
+    expect(picker).toBeTruthy();
+    expect((picker as HTMLElement & { hass?: HomeAssistant }).hass).toBeUndefined();
 
     editor.hass = hass;
     await editor.updateComplete;
 
-    expect(editor.shadowRoot?.querySelector("option[value='sensor.room']")).toBeTruthy();
+    expect((picker as HTMLElement & { hass?: HomeAssistant }).hass).toBe(hass);
+    expect((picker as HTMLElement & { value?: string }).value).toBe("sensor.room");
+  });
+
+  it("emits config-changed when the entity picker value changes", async () => {
+    const editor = document.createElement(
+      "occupancy-heatmap-card-editor"
+    ) as OccupancyHeatmapCardEditor;
+    editor.hass = hass;
+    editor.setConfig({ entity: "sensor.room" });
+    document.body.append(editor);
+    await editor.updateComplete;
+    const listener = vi.fn();
+    editor.addEventListener("config-changed", listener);
+
+    const picker = editor.shadowRoot?.querySelector<HTMLElement>("ha-entity-picker");
+    if (!picker) throw new Error("Entity picker missing");
+    picker.dispatchEvent(
+      new CustomEvent("value-changed", {
+        detail: { value: "sensor.kitchen" },
+      })
+    );
+
+    expect(listener).toHaveBeenCalledOnce();
+    expect(listener.mock.calls[0]?.[0].detail.config.entity).toBe("sensor.kitchen");
   });
 
   it("renders the required configuration controls", async () => {
@@ -44,7 +70,7 @@ describe("OccupancyHeatmapCardEditor", () => {
     document.body.append(editor);
     await editor.updateComplete;
 
-    expect(editor.shadowRoot?.querySelector("select[name='entity']")).toBeTruthy();
+    expect(editor.shadowRoot?.querySelector("ha-entity-picker")).toBeTruthy();
     expect(editor.shadowRoot?.querySelector("input[name='days']")).toBeTruthy();
     expect(editor.shadowRoot?.querySelector("select[name='mode']")).toBeTruthy();
     expect(

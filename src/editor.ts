@@ -58,6 +58,10 @@ export class OccupancyHeatmapCardEditor extends LitElement {
       padding: 8px 10px;
     }
 
+    ha-entity-picker {
+      width: 100%;
+    }
+
     input:focus-visible,
     select:focus-visible,
     button:focus-visible {
@@ -176,6 +180,11 @@ export class OccupancyHeatmapCardEditor extends LitElement {
     return (event.currentTarget as HTMLInputElement | HTMLSelectElement).value;
   }
 
+  private entityChanged(event: CustomEvent<{ value?: string }>): void {
+    const entity = event.detail.value?.trim();
+    if (entity) this.emit({ entity });
+  }
+
   private renameState(oldState: string, newState: string): void {
     const trimmed = newState.trim();
     if (!trimmed || trimmed === oldState) return;
@@ -206,9 +215,6 @@ export class OccupancyHeatmapCardEditor extends LitElement {
 
   override render() {
     const mode: HeatmapMode = this.config.mode ?? "auto";
-    const entities = Object.values(this.hass?.states ?? {}).sort((left, right) =>
-      left.entity_id.localeCompare(right.entity_id)
-    );
     const stateColors = Object.entries(this.config.state_colors ?? {});
 
     return html`<div class="editor">
@@ -216,19 +222,11 @@ export class OccupancyHeatmapCardEditor extends LitElement {
         <h3>Source</h3>
         <label>
           Entity
-          <select
-            name="entity"
+          <ha-entity-picker
+            .hass=${this.hass}
             .value=${this.config.entity ?? ""}
-            @change=${(event: Event) => this.emit({ entity: this.value(event) })}
-          >
-            <option value="" disabled>Select an entity</option>
-            ${entities.map(
-              (entity) =>
-                html`<option value=${entity.entity_id}>
-                  ${entity.attributes.friendly_name || entity.entity_id}
-                </option>`
-            )}
-          </select>
+            @value-changed=${this.entityChanged}
+          ></ha-entity-picker>
         </label>
         <label>
           Title
