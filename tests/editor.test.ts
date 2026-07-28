@@ -73,6 +73,16 @@ describe("OccupancyHeatmapCardEditor", () => {
     expect(editor.shadowRoot?.querySelector("ha-entity-picker")).toBeTruthy();
     expect(editor.shadowRoot?.querySelector("input[name='days']")).toBeTruthy();
     expect(editor.shadowRoot?.querySelector("select[name='mode']")).toBeTruthy();
+    const startHour = editor.shadowRoot?.querySelector<HTMLSelectElement>(
+      "select[name='start_hour']"
+    );
+    const endHour = editor.shadowRoot?.querySelector<HTMLSelectElement>(
+      "select[name='end_hour']"
+    );
+    expect(startHour?.value).toBe("0");
+    expect(endHour?.value).toBe("23");
+    expect(startHour?.options).toHaveLength(24);
+    expect(endHour?.options).toHaveLength(24);
     expect(
       editor.shadowRoot?.querySelector("input[name='numeric_threshold']")
     ).toBeTruthy();
@@ -80,6 +90,49 @@ describe("OccupancyHeatmapCardEditor", () => {
       editor.shadowRoot?.querySelector("select[name='numeric_intensity']")
     ).toBeTruthy();
     expect(editor.shadowRoot?.querySelector("input[name='numeric_color']")).toBeTruthy();
+  });
+
+  it("disables hour choices that would create an overnight range", async () => {
+    const editor = document.createElement(
+      "occupancy-heatmap-card-editor"
+    ) as OccupancyHeatmapCardEditor;
+    editor.setConfig({ entity: "sensor.room", start_hour: 9, end_hour: 18 });
+    document.body.append(editor);
+    await editor.updateComplete;
+
+    const start = editor.shadowRoot?.querySelector<HTMLSelectElement>(
+      "select[name='start_hour']"
+    );
+    const end = editor.shadowRoot?.querySelector<HTMLSelectElement>(
+      "select[name='end_hour']"
+    );
+    expect(start?.options[19]?.disabled).toBe(true);
+    expect(start?.options[18]?.disabled).toBe(false);
+    expect(end?.options[8]?.disabled).toBe(true);
+    expect(end?.options[9]?.disabled).toBe(false);
+  });
+
+  it.each([
+    ["start_hour", "9", 9],
+    ["end_hour", "23", 23],
+  ] as const)("emits numeric %s changes", async (name, value, expected) => {
+    const editor = document.createElement(
+      "occupancy-heatmap-card-editor"
+    ) as OccupancyHeatmapCardEditor;
+    editor.setConfig({ entity: "sensor.room", start_hour: 0, end_hour: 23 });
+    document.body.append(editor);
+    await editor.updateComplete;
+    const listener = vi.fn();
+    editor.addEventListener("config-changed", listener);
+    const select = editor.shadowRoot?.querySelector<HTMLSelectElement>(
+      `select[name='${name}']`
+    );
+    if (!select) throw new Error(`${name} selector missing`);
+
+    select.value = value;
+    select.dispatchEvent(new Event("change", { bubbles: true, composed: true }));
+
+    expect(listener.mock.calls[0]?.[0].detail.config[name]).toBe(expected);
   });
 
   it("emits sensor value intensity changes", async () => {

@@ -218,9 +218,25 @@ export class OccupancyHeatmapCardEditor extends LitElement {
     this.draftState = "";
   }
 
+  protected override updated(): void {
+    const selections = {
+      start_hour: this.config.start_hour ?? 0,
+      end_hour: this.config.end_hour ?? 23,
+    };
+    for (const [name, hour] of Object.entries(selections)) {
+      const select = this.renderRoot.querySelector<HTMLSelectElement>(
+        `select[name='${name}']`
+      );
+      if (select) select.value = String(hour);
+    }
+  }
+
   override render() {
     const mode: HeatmapMode = this.config.mode ?? "auto";
     const stateColors = Object.entries(this.config.state_colors ?? {});
+    const startHour = this.config.start_hour ?? 0;
+    const endHour = this.config.end_hour ?? 23;
+    const hours = Array.from({ length: 24 }, (_, hour) => hour);
 
     return html`<div class="editor">
       <section class="section">
@@ -266,6 +282,38 @@ export class OccupancyHeatmapCardEditor extends LitElement {
               <option value="auto">Automatic</option>
               <option value="numeric">Numeric</option>
               <option value="categorical">Categorical</option>
+            </select>
+          </label>
+        </div>
+        <div class="two-column">
+          <label>
+            Start hour
+            <select
+              name="start_hour"
+              .value=${String(startHour)}
+              @change=${(event: Event) =>
+                this.emit({ start_hour: Number(this.value(event)) })}
+            >
+              ${hours.map(
+                (hour) =>
+                  html`<option value=${hour} ?disabled=${hour > endHour}>${hour}</option>`
+              )}
+            </select>
+          </label>
+          <label>
+            End hour
+            <select
+              name="end_hour"
+              .value=${String(endHour)}
+              @change=${(event: Event) =>
+                this.emit({ end_hour: Number(this.value(event)) })}
+            >
+              ${hours.map(
+                (hour) =>
+                  html`<option value=${hour} ?disabled=${hour < startHour}>
+                    ${hour}
+                  </option>`
+              )}
             </select>
           </label>
         </div>
