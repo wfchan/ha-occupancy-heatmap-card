@@ -124,7 +124,7 @@ export class OccupancyHeatmapCard extends LitElement {
     .matrix-row {
       display: grid;
       grid-template-columns: var(--heatmap-label-width) repeat(
-          24,
+          var(--heatmap-column-count),
           var(--heatmap-cell-size)
         );
       gap: var(--heatmap-gap);
@@ -398,10 +398,13 @@ export class OccupancyHeatmapCard extends LitElement {
     const daySlots = createHourlySlots(
       this.config.days,
       now,
-      this._hass.config.time_zone
+      this._hass.config.time_zone,
+      this.config.start_hour,
+      this.config.end_hour
     );
-    const start = daySlots[0]?.cells[0]?.start;
-    if (!start) return;
+    const selectedStart = daySlots[0]?.cells[0]?.start;
+    if (!selectedStart) return;
+    const start = new Date(selectedStart.getTime());
 
     this.viewState = this.data ? "ready" : "loading";
     this.errorMessage = "";
@@ -563,6 +566,8 @@ export class OccupancyHeatmapCard extends LitElement {
     const hours = this.data.totalSeconds / 3600;
     const summaryKind = this.data.mode === "numeric" ? "occupied" : "recorded";
     const currentColor = this.stateColor(entity?.state);
+    const displayedCells = this.data.days[0]?.cells ?? [];
+    const columnCount = displayedCells.length;
 
     return html`<ha-card aria-busy="false">
       <div class="content">
@@ -603,12 +608,16 @@ export class OccupancyHeatmapCard extends LitElement {
         </div>
 
         <div class="scroll" aria-label="Hourly occupancy heatmap">
-          <div class="matrix" role="grid">
+          <div
+            class="matrix"
+            role="grid"
+            style=${styleMap({ "--heatmap-column-count": String(columnCount) })}
+          >
             <div class="matrix-row hour-row" role="row">
               <span class="corner"></span>
-              ${Array.from({ length: 24 }, (_, hour) =>
-                hour % 3 === 0
-                  ? html`<span class="hour-label" role="columnheader">${hour}</span>`
+              ${displayedCells.map((cell, index) =>
+                index % 3 === 0
+                  ? html`<span class="hour-label" role="columnheader">${cell.hour}</span>`
                   : html`<span class="hour-label" aria-hidden="true"></span>`
               )}
             </div>

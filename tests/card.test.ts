@@ -107,6 +107,56 @@ describe("OccupancyHeatmapCard", () => {
     expect(card.shadowRoot?.textContent).toContain("Room occupancy");
   });
 
+  it("renders only selected hours with relative three-hour labels", async () => {
+    vi.setSystemTime(new Date("2026-07-28T12:00:00+08:00"));
+    const recorded = Promise.resolve({
+      "sensor.room": [{ s: "1", lu: Date.parse("2026-07-28T01:00:00Z") / 1000 }],
+    });
+    const card = document.createElement("occupancy-heatmap-card") as OccupancyHeatmapCard;
+    card.setConfig({
+      entity: "sensor.room",
+      mode: "numeric",
+      days: 1,
+      start_hour: 9,
+      end_hour: 23,
+    });
+    card.hass = hass(recorded);
+    document.body.append(card);
+    await settle(card);
+
+    expect(card.shadowRoot?.querySelectorAll("button.cell")).toHaveLength(15);
+    expect(
+      [
+        ...(card.shadowRoot?.querySelectorAll(".hour-label[role='columnheader']") ?? []),
+      ].map((label) => label.textContent)
+    ).toEqual(["9", "12", "15", "18", "21"]);
+    expect(
+      card.shadowRoot
+        ?.querySelector<HTMLElement>(".matrix")
+        ?.style.getPropertyValue("--heatmap-column-count")
+    ).toBe("15");
+  });
+
+  it("requests history from the oldest selected start hour", async () => {
+    vi.setSystemTime(new Date("2026-07-28T12:00:00+08:00"));
+    const homeAssistant = hass(Promise.resolve({ "sensor.room": [] }));
+    const callWS = vi.spyOn(homeAssistant, "callWS");
+    const card = document.createElement("occupancy-heatmap-card") as OccupancyHeatmapCard;
+    card.setConfig({
+      entity: "sensor.room",
+      days: 1,
+      start_hour: 9,
+      end_hour: 23,
+    });
+    card.hass = homeAssistant;
+    document.body.append(card);
+    await settle(card);
+
+    expect(callWS).toHaveBeenCalledWith(
+      expect.objectContaining({ start_time: "2026-07-28T01:00:00.000Z" })
+    );
+  });
+
   it("shows weighted sensor value, unit, and occupied duration", async () => {
     const recorded = Promise.resolve({
       "sensor.room": [
