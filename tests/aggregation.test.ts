@@ -51,6 +51,37 @@ describe("createHourlySlots", () => {
     expect(spring.cells[2]?.durationSeconds).toBe(0);
     expect(fall.cells[1]?.durationSeconds).toBe(7200);
   });
+
+  it.each([
+    [0, 23, 24],
+    [9, 23, 15],
+    [9, 9, 1],
+  ] as const)("creates %s-%s as %s inclusive slots", (startHour, endHour, count) => {
+    const result = createHourlySlots(
+      1,
+      new Date("2026-07-28T12:30:00+08:00"),
+      "Asia/Hong_Kong",
+      startHour,
+      endHour
+    );
+
+    expect(result[0]?.cells).toHaveLength(count);
+    expect(result[0]?.cells[0]?.hour).toBe(startHour);
+    expect(result[0]?.cells.at(-1)?.hour).toBe(endHour);
+  });
+
+  it("keeps actual DST duration for a selected fall-back hour", () => {
+    const result = createHourlySlots(
+      1,
+      new Date("2026-11-01T18:00:00-05:00"),
+      "America/New_York",
+      1,
+      1
+    );
+
+    expect(result[0]?.cells).toHaveLength(1);
+    expect(result[0]?.cells[0]).toMatchObject({ hour: 1, durationSeconds: 7200 });
+  });
 });
 
 describe("aggregateHistory", () => {
@@ -211,6 +242,69 @@ describe("aggregateHistory", () => {
       numericValue: 2,
       intensity: 1,
     });
+  });
+
+  it("excludes hidden hours from numeric duration totals", () => {
+    const data = aggregateHistory({
+      history: [
+        history("1", "2026-07-28T00:00:00Z"),
+        history("0", "2026-07-28T01:30:00Z"),
+        history("1", "2026-07-28T02:00:00Z"),
+      ],
+      config: { ...baseConfig, start_hour: 9, end_hour: 9 },
+      timeZone: "Asia/Hong_Kong",
+      now: new Date("2026-07-28T12:00:00+08:00"),
+    });
+
+    expect(data.days[0]?.cells).toHaveLength(1);
+    expect(data.days[0]?.cells[0]).toMatchObject({ hour: 9, occupiedSeconds: 1800 });
+    expect(data.totalSeconds).toBe(1800);
+  });
+
+  it("excludes hidden values from numeric normalization", () => {
+    const data = aggregateHistory({
+      history: [
+        history("2", "2026-07-28T00:00:00Z"),
+        history("10", "2026-07-28T02:00:00Z"),
+      ],
+      config: {
+        ...baseConfig,
+        start_hour: 9,
+        end_hour: 9,
+        numeric_intensity: "value",
+      },
+      timeZone: "Asia/Hong_Kong",
+      now: new Date("2026-07-28T12:00:00+08:00"),
+    });
+
+    expect(data.numericRange).toEqual({ min: 2, max: 2 });
+    expect(data.days[0]?.cells[0]).toMatchObject({ numericValue: 2, intensity: 1 });
+  });
+
+  it("excludes hidden categorical states from winners and totals", () => {
+    const data = aggregateHistory({
+      history: [
+        history("Kitchen", "2026-07-28T00:00:00Z"),
+        history("Living Room", "2026-07-28T01:45:00Z"),
+        history("Away", "2026-07-28T02:00:00Z"),
+      ],
+      config: {
+        ...baseConfig,
+        mode: "categorical",
+        start_hour: 9,
+        end_hour: 9,
+      },
+      timeZone: "Asia/Hong_Kong",
+      now: new Date("2026-07-28T12:00:00+08:00"),
+    });
+
+    expect(data.days[0]?.cells[0]).toMatchObject({
+      hour: 9,
+      state: "Kitchen",
+      occupiedSeconds: 2700,
+    });
+    expect(data.totalSeconds).toBe(3600);
+    expect(data.legendStates).toEqual(["Kitchen", "Living Room"]);
   });
 
   it("carries a state from before the displayed period", () => {

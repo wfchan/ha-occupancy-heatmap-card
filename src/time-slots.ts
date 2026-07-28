@@ -21,7 +21,13 @@ function dateKey(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
-export function createHourlySlots(days: number, now: Date, timeZone: string): DaySlots[] {
+export function createHourlySlots(
+  days: number,
+  now: Date,
+  timeZone: string,
+  startHour = 0,
+  endHour = 23
+): DaySlots[] {
   const localNow = TZDate.tz(timeZone, now);
   const year = localNow.getFullYear();
   const month = localNow.getMonth();
@@ -36,7 +42,7 @@ export function createHourlySlots(days: number, now: Date, timeZone: string): Da
     const dayDate = dayStart.getDate();
     const cells: HourlySlot[] = [];
 
-    for (let hour = 0; hour < 24; hour += 1) {
+    for (let hour = startHour; hour <= endHour; hour += 1) {
       const start = new TZDate(dayYear, dayMonth, dayDate, hour, 0, 0, 0, timeZone);
       const end = new TZDate(dayYear, dayMonth, dayDate, hour + 1, 0, 0, 0, timeZone);
       cells.push({

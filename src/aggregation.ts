@@ -72,7 +72,13 @@ export function aggregateHistory({
   timeZone,
   now,
 }: AggregateOptions): HeatmapData {
-  const slots = createHourlySlots(config.days, now, timeZone);
+  const slots = createHourlySlots(
+    config.days,
+    now,
+    timeZone,
+    config.start_hour,
+    config.end_hour
+  );
   const mode =
     config.mode === "auto"
       ? detectMode(
