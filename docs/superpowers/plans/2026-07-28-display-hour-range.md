@@ -767,7 +767,7 @@ git diff --check
 
 Expected: formatting, lint, strict typing, all Vitest tests, the Rollup production build, all applicable Playwright scenarios, both audits, and whitespace validation pass. The build refreshes the committed files under `dist/`.
 
-- [ ] **Step 3: Commit release preparation**
+- [x] **Step 3: Commit release preparation**
 
 Mark Tasks 1-5 and local release Steps 1-2 complete in this plan, then run:
 
@@ -776,7 +776,7 @@ git add package.json package-lock.json dist/ha-occupancy-heatmap-card.js dist/ha
 git commit -m "chore: prepare v0.3.0"
 ```
 
-- [ ] **Step 4: Push and verify hosted CI**
+- [x] **Step 4: Push and verify hosted CI**
 
 Run:
 
@@ -788,7 +788,7 @@ gh run watch "$CI_RUN_ID" --repo wfchan/ha-occupancy-heatmap-card --exit-status
 
 Expected: the hosted `verify` and `hacs` jobs pass for the `v0.3.0` preparation commit.
 
-- [ ] **Step 5: Publish and verify the release**
+- [x] **Step 5: Publish and verify the release**
 
 Run:
 
@@ -801,7 +801,7 @@ gh release view v0.3.0 --repo wfchan/ha-occupancy-heatmap-card --json url,assets
 
 Expected: the release workflow passes and attaches `ha-occupancy-heatmap-card.js` to public `v0.3.0` so HACS can offer the update.
 
-- [ ] **Step 6: Record completion**
+- [x] **Step 6: Record completion**
 
 Mark every remaining checkbox in this file `[x]`, then run:
 
