@@ -1,0 +1,10 @@
+.DS_Store
+reference_image/
+node_modules/
+coverage/
+playwright-report/
+test-results/
+.vite/
+*.log
+homeassistant/
+

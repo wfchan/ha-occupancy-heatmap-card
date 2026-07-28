@@ -1,0 +1,60 @@
+{
+  "name": "ha-occupancy-heatmap-card",
+  "version": "0.1.0",
+  "description": "Duration-based numeric and categorical heatmaps for Home Assistant",
+  "type": "module",
+  "main": "dist/ha-occupancy-heatmap-card.js",
+  "files": [
+    "dist/ha-occupancy-heatmap-card.js"
+  ],
+  "scripts": {
+    "build": "npm run clean && rollup -c",
+    "check": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run build",
+    "clean": "rm -rf dist",
+    "dev": "vite --host 127.0.0.1",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "home-assistant",
+    "hacs",
+    "lovelace",
+    "heatmap",
+    "occupancy"
+  ],
+  "author": "wfchan",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wfchan/ha-occupancy-heatmap-card.git"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@date-fns/tz": "^1.5.0",
+    "lit": "^3.3.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "@playwright/test": "^1.62.0",
+    "@rollup/plugin-node-resolve": "^16.0.3",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@types/node": "^24.10.0",
+    "eslint": "^9.39.2",
+    "globals": "^16.5.0",
+    "happy-dom": "^20.0.10",
+    "prettier": "^3.9.0",
+    "rollup": "^4.62.0",
+    "rollup-plugin-esbuild": "^6.2.1",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.50.0",
+    "vite": "^7.2.0",
+    "vitest": "^4.0.0"
+  }
+}
