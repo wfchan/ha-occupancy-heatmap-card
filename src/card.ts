@@ -492,7 +492,24 @@ export class OccupancyHeatmapCard extends LitElement {
     }).format(date);
   }
 
-  private cellDetail(cell: HeatmapCell): string {
+  private numericValueLabel(cell: HeatmapCell): string | undefined {
+    if (
+      this.data?.mode !== "numeric" ||
+      this.config?.numeric_intensity !== "value" ||
+      cell.numericValue === undefined
+    ) {
+      return undefined;
+    }
+
+    const locale = this._hass?.locale.language || "en";
+    const value = new Intl.NumberFormat(locale, {
+      maximumFractionDigits: 2,
+    }).format(cell.numericValue);
+    const unit = this._hass?.states[this.config.entity]?.attributes.unit_of_measurement;
+    return unit ? `${value} ${unit}` : value;
+  }
+
+  private cellTimeDetail(cell: HeatmapCell): string {
     const locale = this._hass?.locale.language || "en";
     const date = new Intl.DateTimeFormat(locale, {
       month: "short",
@@ -500,8 +517,13 @@ export class OccupancyHeatmapCard extends LitElement {
       timeZone: this._hass?.config.time_zone,
     }).format(cell.start);
     const minutes = Math.round(cell.occupiedSeconds / 60);
-    const state = cell.state ? `${cell.state}, ` : "";
-    return `${date}, ${String(cell.hour).padStart(2, "0")}:00, ${state}${minutes} min`;
+    return `${date}, ${String(cell.hour).padStart(2, "0")}:00, ${minutes} min`;
+  }
+
+  private cellDetail(cell: HeatmapCell): string {
+    const prefix = this.numericValueLabel(cell) ?? cell.state;
+    const timeDetail = this.cellTimeDetail(cell);
+    return prefix ? `${prefix}, ${timeDetail}` : timeDetail;
   }
 
   private renderCell(cell: HeatmapCell) {
@@ -608,8 +630,14 @@ export class OccupancyHeatmapCard extends LitElement {
         <div class="details" aria-live="polite">
           ${
             this.selected
-              ? html`<strong>${this.selected.state || summaryKind}</strong>
-                  <span>${this.cellDetail(this.selected)}</span>`
+              ? html`<strong
+                    >${
+                      this.numericValueLabel(this.selected) ||
+                      this.selected.state ||
+                      summaryKind
+                    }</strong
+                  >
+                  <span>${this.cellTimeDetail(this.selected)}</span>`
               : html`<span>Select an hour for details</span>`
           }
         </div>

@@ -45,6 +45,7 @@ export interface HassEntity {
   last_changed: string;
   attributes: {
     friendly_name?: string;
+    unit_of_measurement?: string;
     [key: string]: unknown;
   };
 }

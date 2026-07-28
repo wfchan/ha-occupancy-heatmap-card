@@ -15,7 +15,8 @@ function deferred<T>() {
 function hass(
   history: Promise<HistoryStates>,
   state = "1",
-  name = "Room occupancy"
+  name = "Room occupancy",
+  unit?: string
 ): HomeAssistant {
   return {
     states: {
@@ -23,7 +24,10 @@ function hass(
         entity_id: "sensor.room",
         state,
         last_changed: "2026-07-28T00:00:00Z",
-        attributes: { friendly_name: name },
+        attributes: {
+          friendly_name: name,
+          ...(unit ? { unit_of_measurement: unit } : {}),
+        },
       },
     },
     config: { time_zone: "Asia/Hong_Kong" },
@@ -101,6 +105,36 @@ describe("OccupancyHeatmapCard", () => {
     expect(card.shadowRoot?.querySelectorAll("button.cell")).toHaveLength(24);
     expect(card.shadowRoot?.textContent).toContain("0.5 h occupied");
     expect(card.shadowRoot?.textContent).toContain("Room occupancy");
+  });
+
+  it("shows weighted sensor value, unit, and occupied duration", async () => {
+    const recorded = Promise.resolve({
+      "sensor.room": [
+        { s: "1", lu: Date.parse("2026-07-27T16:00:00Z") / 1000 },
+        { s: "3", lu: Date.parse("2026-07-27T16:45:00Z") / 1000 },
+      ],
+    });
+    const card = document.createElement("occupancy-heatmap-card") as OccupancyHeatmapCard;
+    card.setConfig({
+      entity: "sensor.room",
+      mode: "numeric",
+      days: 1,
+      numeric_intensity: "value",
+    });
+    card.hass = hass(recorded, "3", "Person count", "people");
+    document.body.append(card);
+    await settle(card);
+
+    const occupied =
+      card.shadowRoot?.querySelector<HTMLButtonElement>("button.cell.filled");
+    occupied?.focus();
+    await card.updateComplete;
+
+    expect(occupied?.getAttribute("aria-label")).toContain("1.5 people");
+    expect(card.shadowRoot?.querySelector(".details strong")?.textContent).toBe(
+      "1.5 people"
+    );
+    expect(card.shadowRoot?.querySelector(".details")?.textContent).toContain("60 min");
   });
 
   it("renders the dominant categorical state and legend", async () => {

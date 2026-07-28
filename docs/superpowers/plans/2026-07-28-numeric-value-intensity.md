@@ -144,10 +144,7 @@ Add focused tests using `{ ...baseConfig, numeric_intensity: "value" as const }`
 ```ts
 it("calculates a time-weighted occupied value", () => {
   const data = aggregateHistory({
-    history: [
-      history("1", "2026-07-27T16:00:00Z"),
-      history("3", "2026-07-27T16:45:00Z"),
-    ],
+    history: [history("1", "2026-07-27T16:00:00Z"), history("3", "2026-07-27T16:45:00Z")],
     config: { ...baseConfig, numeric_intensity: "value" },
     timeZone: "Asia/Hong_Kong",
     now: new Date("2026-07-28T01:00:00+08:00"),
@@ -163,10 +160,7 @@ it("calculates a time-weighted occupied value", () => {
 
 it("does not let below-threshold time dilute the occupied value", () => {
   const data = aggregateHistory({
-    history: [
-      history("0", "2026-07-27T16:00:00Z"),
-      history("2", "2026-07-27T16:30:00Z"),
-    ],
+    history: [history("0", "2026-07-27T16:00:00Z"), history("2", "2026-07-27T16:30:00Z")],
     config: { ...baseConfig, numeric_intensity: "value" },
     timeZone: "Asia/Hong_Kong",
     now: new Date("2026-07-28T01:00:00+08:00"),
@@ -215,8 +209,7 @@ const value = Number(interval.state);
 occupiedSeconds += seconds;
 weightedTotal += value * seconds;
 
-const numericValue =
-  occupiedSeconds > 0 ? weightedTotal / occupiedSeconds : undefined;
+const numericValue = occupiedSeconds > 0 ? weightedTotal / occupiedSeconds : undefined;
 
 return {
   ...slot,
@@ -253,8 +246,7 @@ if (mode === "numeric" && config.numeric_intensity === "value" && numericRange) 
   for (const day of days) {
     for (const cell of day.cells) {
       if (cell.numericValue === undefined || cell.occupiedSeconds === 0) continue;
-      cell.intensity =
-        span === 0 ? 1 : (cell.numericValue - numericRange.min) / span;
+      cell.intensity = span === 0 ? 1 : (cell.numericValue - numericRange.min) / span;
     }
   }
 }
@@ -294,9 +286,7 @@ git commit -m "feat: scale numeric cells by weighted value"
 Extend the required-controls test and add conditional/event tests:
 
 ```ts
-expect(
-  editor.shadowRoot?.querySelector("select[name='numeric_intensity']")
-).toBeTruthy();
+expect(editor.shadowRoot?.querySelector("select[name='numeric_intensity']")).toBeTruthy();
 
 it("emits sensor value intensity changes", async () => {
   const editor = document.createElement(
@@ -327,9 +317,7 @@ it("hides numeric intensity in categorical mode", async () => {
   document.body.append(editor);
   await editor.updateComplete;
 
-  expect(
-    editor.shadowRoot?.querySelector("select[name='numeric_intensity']")
-  ).toBeNull();
+  expect(editor.shadowRoot?.querySelector("select[name='numeric_intensity']")).toBeNull();
 });
 ```
 
@@ -402,9 +390,7 @@ it("shows weighted sensor value, unit, and occupied duration", async () => {
       { s: "3", lu: Date.parse("2026-07-27T16:45:00Z") / 1000 },
     ],
   });
-  const card = document.createElement(
-    "occupancy-heatmap-card"
-  ) as OccupancyHeatmapCard;
+  const card = document.createElement("occupancy-heatmap-card") as OccupancyHeatmapCard;
   card.setConfig({
     entity: "sensor.room",
     mode: "numeric",
@@ -415,16 +401,13 @@ it("shows weighted sensor value, unit, and occupied duration", async () => {
   document.body.append(card);
   await settle(card);
 
-  const occupied = card.shadowRoot?.querySelector<HTMLButtonElement>(
-    "button.cell.filled"
-  );
+  const occupied =
+    card.shadowRoot?.querySelector<HTMLButtonElement>("button.cell.filled");
   occupied?.focus();
   await card.updateComplete;
 
   expect(occupied?.getAttribute("aria-label")).toContain("1.5 people");
-  expect(card.shadowRoot?.querySelector(".details")?.textContent).toContain(
-    "1.5 people"
-  );
+  expect(card.shadowRoot?.querySelector(".details")?.textContent).toContain("1.5 people");
   expect(card.shadowRoot?.querySelector(".details")?.textContent).toContain("60 min");
 });
 ```

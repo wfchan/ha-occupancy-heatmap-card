@@ -132,8 +132,7 @@ export function aggregateHistory({
         return {
           ...slot,
           occupiedSeconds,
-          numericValue:
-            occupiedSeconds > 0 ? weightedTotal / occupiedSeconds : undefined,
+          numericValue: occupiedSeconds > 0 ? weightedTotal / occupiedSeconds : undefined,
           intensity: Math.min(1, occupiedSeconds / slot.durationSeconds),
           future,
         };
@@ -202,8 +201,7 @@ export function aggregateHistory({
         if (cell.numericValue === undefined || cell.occupiedSeconds === 0) {
           continue;
         }
-        cell.intensity =
-          span === 0 ? 1 : (cell.numericValue - numericRange.min) / span;
+        cell.intensity = span === 0 ? 1 : (cell.numericValue - numericRange.min) / span;
       }
     }
   }
