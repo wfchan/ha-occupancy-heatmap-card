@@ -1,0 +1,135 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import "../src/ha-occupancy-heatmap-card";
+import { OccupancyHeatmapCard } from "../src/card";
+import type { HistoryStates, HomeAssistant } from "../src/types";
+
+function deferred<T>() {
+  let resolve!: (value: T) => void;
+  const promise = new Promise<T>((done) => {
+    resolve = done;
+  });
+  return { promise, resolve };
+}
+
+function hass(
+  history: Promise<HistoryStates>,
+  state = "1",
+  name = "Room occupancy"
+): HomeAssistant {
+  return {
+    states: {
+      "sensor.room": {
+        entity_id: "sensor.room",
+        state,
+        last_changed: "2026-07-28T00:00:00Z",
+        attributes: { friendly_name: name },
+      },
+    },
+    config: { time_zone: "Asia/Hong_Kong" },
+    locale: { language: "en" },
+    callWS: <T>() => history as Promise<T>,
+  };
+}
+
+async function settle(card: OccupancyHeatmapCard): Promise<void> {
+  for (let index = 0; index < 6; index += 1) {
+    await Promise.resolve();
+    await card.updateComplete;
+  }
+}
+
+describe("OccupancyHeatmapCard", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-07-28T01:00:00+08:00"));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("renders a loading state while history is pending", async () => {
+    const pending = deferred<HistoryStates>();
+    const card = document.createElement("occupancy-heatmap-card") as OccupancyHeatmapCard;
+    card.setConfig({ entity: "sensor.room" });
+    card.hass = hass(pending.promise);
+    document.body.append(card);
+    await card.updateComplete;
+
+    expect(
+      card.shadowRoot?.querySelector("[data-state='loading']")?.textContent
+    ).toContain("Loading history");
+  });
+
+  it("renders 24 numeric cells per day and an occupied summary", async () => {
+    const history = Promise.resolve({
+      "sensor.room": [
+        { s: "0", lu: Date.parse("2026-07-27T16:00:00Z") / 1000 },
+        { s: "1", lu: Date.parse("2026-07-27T16:30:00Z") / 1000 },
+      ],
+    });
+    const card = document.createElement("occupancy-heatmap-card") as OccupancyHeatmapCard;
+    card.setConfig({ entity: "sensor.room", mode: "numeric", days: 1 });
+    card.hass = hass(history);
+    document.body.append(card);
+    await settle(card);
+
+    expect(card.shadowRoot?.querySelectorAll("button.cell")).toHaveLength(24);
+    expect(card.shadowRoot?.textContent).toContain("0.5 h occupied");
+    expect(card.shadowRoot?.textContent).toContain("Room occupancy");
+  });
+
+  it("renders the dominant categorical state and legend", async () => {
+    const history = Promise.resolve({
+      "sensor.room": [
+        { s: "Kitchen", lu: Date.parse("2026-07-27T16:00:00Z") / 1000 },
+        { s: "Living Room", lu: Date.parse("2026-07-27T16:20:00Z") / 1000 },
+      ],
+    });
+    const card = document.createElement("occupancy-heatmap-card") as OccupancyHeatmapCard;
+    card.setConfig({ entity: "sensor.room", mode: "categorical", days: 1 });
+    card.hass = hass(history, "Living Room", "Location");
+    document.body.append(card);
+    await settle(card);
+
+    expect(
+      card.shadowRoot?.querySelector("button.cell")?.getAttribute("aria-label")
+    ).toContain("Living Room");
+    expect(card.shadowRoot?.querySelector(".legend")?.textContent).toContain("Kitchen");
+    expect(card.shadowRoot?.querySelector(".legend")?.textContent).toContain(
+      "Living Room"
+    );
+  });
+
+  it("renders distinct missing entity, empty history, and history error states", async () => {
+    const missing = document.createElement(
+      "occupancy-heatmap-card"
+    ) as OccupancyHeatmapCard;
+    missing.setConfig({ entity: "sensor.missing" });
+    missing.hass = hass(Promise.resolve({}));
+    document.body.append(missing);
+    await settle(missing);
+    expect(missing.shadowRoot?.querySelector("[data-state='missing']")).toBeTruthy();
+
+    const empty = document.createElement(
+      "occupancy-heatmap-card"
+    ) as OccupancyHeatmapCard;
+    empty.setConfig({ entity: "sensor.room" });
+    empty.hass = hass(Promise.resolve({ "sensor.room": [] }));
+    document.body.append(empty);
+    await settle(empty);
+    expect(empty.shadowRoot?.querySelector("[data-state='empty']")).toBeTruthy();
+
+    const failed = document.createElement(
+      "occupancy-heatmap-card"
+    ) as OccupancyHeatmapCard;
+    failed.setConfig({ entity: "sensor.room" });
+    failed.hass = hass(Promise.reject(new Error("Recorder unavailable")));
+    document.body.append(failed);
+    await settle(failed);
+    expect(
+      failed.shadowRoot?.querySelector("[data-state='error']")?.textContent
+    ).toContain("Recorder unavailable");
+  });
+});

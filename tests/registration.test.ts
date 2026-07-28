@@ -19,6 +19,6 @@ describe("occupancy heatmap card registration", () => {
     document.body.append(card);
     await card.updateComplete;
 
-    expect(card.shadowRoot?.textContent).toContain("Occupancy Heatmap Card");
+    expect(card.shadowRoot?.textContent).toContain("Loading history");
   });
 });
