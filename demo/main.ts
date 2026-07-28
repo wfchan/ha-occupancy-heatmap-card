@@ -63,7 +63,10 @@ const hass: HomeAssistant = {
       entity_id: "sensor.living_room_activity",
       state: "2",
       last_changed: new Date(now - 20 * 60 * 1000).toISOString(),
-      attributes: { friendly_name: "Living room activity" },
+      attributes: {
+        friendly_name: "Living room activity",
+        unit_of_measurement: "people",
+      },
     },
     "sensor.rocky_location": {
       entity_id: "sensor.rocky_location",
@@ -86,16 +89,33 @@ const hass: HomeAssistant = {
   },
 };
 
-const numericCard = document.querySelector("#numeric-card") as OccupancyHeatmapCard;
-numericCard.setConfig({
+const numericValueCard = document.querySelector(
+  "#numeric-value-card"
+) as OccupancyHeatmapCard;
+numericValueCard.setConfig({
   entity: "sensor.living_room_activity",
-  title: "Living room activity",
+  title: "Activity by sensor value",
   days: 7,
   mode: "numeric",
   numeric_threshold: 0,
+  numeric_intensity: "value",
   numeric_color: "#52a9e8",
 });
-numericCard.hass = hass;
+numericValueCard.hass = hass;
+
+const numericDurationCard = document.querySelector(
+  "#numeric-duration-card"
+) as OccupancyHeatmapCard;
+numericDurationCard.setConfig({
+  entity: "sensor.living_room_activity",
+  title: "Activity by occupied time",
+  days: 7,
+  mode: "numeric",
+  numeric_threshold: 0,
+  numeric_intensity: "duration",
+  numeric_color: "#62c78a",
+});
+numericDurationCard.hass = hass;
 
 const categoricalCard = document.querySelector(
   "#categorical-card"

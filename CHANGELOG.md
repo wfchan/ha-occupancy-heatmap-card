@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.0 - 2026-07-28
+
+- Add selectable occupied-duration or sensor-value color intensity for numeric heatmaps.
+- Normalize time-weighted hourly values across the selected date range.
+- Show weighted values and Home Assistant units in hourly details.
+- Document the complete numeric intensity calculations and edge-case rules.
+
 ## 0.1.1 - 2026-07-28
 
 - Replace the entity dropdown with Home Assistant's searchable entity picker.

@@ -12,14 +12,23 @@ for (const theme of ["light", "dark"] as const) {
 
     await page.goto(`/?theme=${theme}`);
     await expect(
-      page.getByRole("heading", { name: "Living room activity" })
+      page.getByRole("heading", { name: "Activity by sensor value" })
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Activity by occupied time" })
     ).toBeVisible();
     await expect(page.getByRole("heading", { name: "Rocky location" })).toBeVisible();
 
     const cards = page.locator("occupancy-heatmap-card");
-    await expect(cards).toHaveCount(2);
+    await expect(cards).toHaveCount(3);
     const cells = page.locator("occupancy-heatmap-card button.cell");
-    await expect(cells).toHaveCount(336);
+    await expect(cells).toHaveCount(504);
+
+    const numericCard = page.locator("occupancy-heatmap-card#numeric-value-card");
+    const numericCell = numericCard.locator("button.cell.filled:not(:disabled)").first();
+    await numericCell.click();
+    await expect(numericCard.locator(".details")).toContainText(/\d+(\.\d+)? people/);
+    await expect(numericCard.locator(".details")).toContainText(/\d+ min/);
 
     const activeCells = page.locator(
       "occupancy-heatmap-card button.cell.filled:not(:disabled)"
@@ -63,7 +72,7 @@ for (const theme of ["light", "dark"] as const) {
       )
     ).toBe(true);
     if (testInfo.project.name === "desktop") {
-      expect(layout.matricesScroll).toEqual([false, false]);
+      expect(layout.matricesScroll).toEqual([false, false, false]);
     }
     expect(errors).toEqual([]);
 
@@ -82,7 +91,9 @@ test("mobile keeps the page fitted and scrolls only the heatmap matrix", async (
 }, testInfo) => {
   test.skip(testInfo.project.name !== "mobile", "Mobile-only viewport assertion");
   await page.goto("/?theme=dark");
-  await expect(page.getByRole("heading", { name: "Living room activity" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Activity by sensor value" })
+  ).toBeVisible();
 
   const fit = await page.evaluate(() => {
     const card = document.querySelector("occupancy-heatmap-card");
