@@ -14,6 +14,7 @@ export interface HeatmapCell {
   occupiedSeconds: number;
   intensity: number;
   state?: string;
+  numericValue?: number;
   future: boolean;
 }
 
@@ -29,6 +30,7 @@ export interface HeatmapData {
   days: HeatmapDay[];
   totalSeconds: number;
   legendStates: string[];
+  numericRange?: { min: number; max: number };
 }
 
 interface AggregateOptions {
@@ -106,24 +108,32 @@ export function aggregateHistory({
 
       if (mode === "numeric") {
         let occupiedSeconds = 0;
+        let weightedTotal = 0;
         for (let index = firstIntervalIndex; index < intervals.length; index += 1) {
           const interval = intervals[index]!;
           if (interval.start >= effectiveEnd) break;
+          const value = Number(interval.state);
           if (
+            !interval.state.trim() ||
             excluded.has(interval.state) ||
-            Number(interval.state) <= config.numeric_threshold
+            !Number.isFinite(value) ||
+            value <= config.numeric_threshold
           ) {
             continue;
           }
-          if (!Number.isFinite(Number(interval.state))) {
+          const seconds = overlapSeconds(interval, slotStart, effectiveEnd);
+          if (seconds <= 0) {
             continue;
           }
-          occupiedSeconds += overlapSeconds(interval, slotStart, effectiveEnd);
+          occupiedSeconds += seconds;
+          weightedTotal += value * seconds;
         }
         totalSeconds += occupiedSeconds;
         return {
           ...slot,
           occupiedSeconds,
+          numericValue:
+            occupiedSeconds > 0 ? weightedTotal / occupiedSeconds : undefined,
           intensity: Math.min(1, occupiedSeconds / slot.durationSeconds),
           future,
         };
@@ -171,5 +181,32 @@ export function aggregateHistory({
     }),
   }));
 
-  return { mode, days, totalSeconds, legendStates };
+  const numericValues =
+    mode === "numeric" && config.numeric_intensity === "value"
+      ? days.flatMap((day) =>
+          day.cells.flatMap((cell) =>
+            !cell.future && cell.occupiedSeconds > 0 && cell.numericValue !== undefined
+              ? [cell.numericValue]
+              : []
+          )
+        )
+      : [];
+  const numericRange = numericValues.length
+    ? { min: Math.min(...numericValues), max: Math.max(...numericValues) }
+    : undefined;
+
+  if (numericRange) {
+    const span = numericRange.max - numericRange.min;
+    for (const day of days) {
+      for (const cell of day.cells) {
+        if (cell.numericValue === undefined || cell.occupiedSeconds === 0) {
+          continue;
+        }
+        cell.intensity =
+          span === 0 ? 1 : (cell.numericValue - numericRange.min) / span;
+      }
+    }
+  }
+
+  return { mode, days, totalSeconds, legendStates, numericRange };
 }

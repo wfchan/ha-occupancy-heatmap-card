@@ -73,6 +73,144 @@ describe("aggregateHistory", () => {
     expect(data.totalSeconds).toBe(1800);
   });
 
+  it("calculates a time-weighted occupied value", () => {
+    const data = aggregateHistory({
+      history: [
+        history("1", "2026-07-27T16:00:00Z"),
+        history("3", "2026-07-27T16:45:00Z"),
+      ],
+      config: { ...baseConfig, numeric_intensity: "value" },
+      timeZone: "Asia/Hong_Kong",
+      now: new Date("2026-07-28T01:00:00+08:00"),
+    });
+
+    expect(data.days[0]?.cells[0]).toMatchObject({
+      occupiedSeconds: 3600,
+      numericValue: 1.5,
+      intensity: 1,
+    });
+    expect(data.numericRange).toEqual({ min: 1.5, max: 1.5 });
+  });
+
+  it("does not let below-threshold time dilute the occupied value", () => {
+    const data = aggregateHistory({
+      history: [
+        history("0", "2026-07-27T16:00:00Z"),
+        history("2", "2026-07-27T16:30:00Z"),
+      ],
+      config: { ...baseConfig, numeric_intensity: "value" },
+      timeZone: "Asia/Hong_Kong",
+      now: new Date("2026-07-28T01:00:00+08:00"),
+    });
+
+    expect(data.days[0]?.cells[0]).toMatchObject({
+      occupiedSeconds: 1800,
+      numericValue: 2,
+      intensity: 1,
+    });
+  });
+
+  it("normalizes occupied hourly values across the selected range", () => {
+    const data = aggregateHistory({
+      history: [
+        history("1", "2026-07-27T16:00:00Z"),
+        history("2", "2026-07-27T17:00:00Z"),
+        history("3", "2026-07-27T18:00:00Z"),
+      ],
+      config: { ...baseConfig, numeric_intensity: "value" },
+      timeZone: "Asia/Hong_Kong",
+      now: new Date("2026-07-28T03:00:00+08:00"),
+    });
+
+    expect(data.numericRange).toEqual({ min: 1, max: 3 });
+    expect(data.days[0]?.cells.slice(0, 3).map((cell) => cell.intensity)).toEqual([
+      0, 0.5, 1,
+    ]);
+  });
+
+  it("uses one numeric range across all selected days", () => {
+    const data = aggregateHistory({
+      history: [
+        history("1", "2026-07-26T16:00:00Z"),
+        history("3", "2026-07-27T16:00:00Z"),
+      ],
+      config: { ...baseConfig, days: 2, numeric_intensity: "value" },
+      timeZone: "Asia/Hong_Kong",
+      now: new Date("2026-07-28T01:00:00+08:00"),
+    });
+
+    expect(data.numericRange).toEqual({ min: 1, max: 3 });
+    expect(data.days[0]?.cells[0]?.intensity).toBe(0);
+    expect(data.days[1]?.cells[0]?.intensity).toBe(1);
+  });
+
+  it("omits excluded and non-numeric intervals from weighted values", () => {
+    const data = aggregateHistory({
+      history: [
+        history("1", "2026-07-27T16:00:00Z"),
+        history("unknown", "2026-07-27T16:12:00Z"),
+        history("3", "2026-07-27T16:24:00Z"),
+        history("not-a-number", "2026-07-27T16:36:00Z"),
+        history("", "2026-07-27T16:48:00Z"),
+      ],
+      config: {
+        ...baseConfig,
+        numeric_intensity: "value",
+        numeric_threshold: -1,
+      },
+      timeZone: "Asia/Hong_Kong",
+      now: new Date("2026-07-28T01:00:00+08:00"),
+    });
+
+    expect(data.days[0]?.cells[0]).toMatchObject({
+      occupiedSeconds: 1440,
+      numericValue: 2,
+      intensity: 1,
+    });
+  });
+
+  it("leaves future cells out of the numeric range", () => {
+    const data = aggregateHistory({
+      history: [history("4", "2026-07-27T16:00:00Z")],
+      config: { ...baseConfig, numeric_intensity: "value" },
+      timeZone: "Asia/Hong_Kong",
+      now: new Date("2026-07-28T00:30:00+08:00"),
+    });
+
+    expect(data.numericRange).toEqual({ min: 4, max: 4 });
+    expect(data.days[0]?.cells[0]).toMatchObject({
+      occupiedSeconds: 1800,
+      numericValue: 4,
+      intensity: 1,
+    });
+    expect(data.days[0]?.cells[1]).toMatchObject({
+      future: true,
+      occupiedSeconds: 0,
+      intensity: 0,
+    });
+    expect(data.days[0]?.cells[1]?.numericValue).toBeUndefined();
+  });
+
+  it("weights values over the actual fall-back hour duration", () => {
+    const data = aggregateHistory({
+      history: [
+        history("1", "2026-11-01T05:00:00Z"),
+        history("3", "2026-11-01T06:00:00Z"),
+        history("0", "2026-11-01T07:00:00Z"),
+      ],
+      config: { ...baseConfig, numeric_intensity: "value" },
+      timeZone: "America/New_York",
+      now: new Date("2026-11-01T03:00:00-05:00"),
+    });
+
+    expect(data.days[0]?.cells[1]).toMatchObject({
+      durationSeconds: 7200,
+      occupiedSeconds: 7200,
+      numericValue: 2,
+      intensity: 1,
+    });
+  });
+
   it("carries a state from before the displayed period", () => {
     const data = aggregateHistory({
       history: [history("2", "2026-07-27T15:30:00Z")],
