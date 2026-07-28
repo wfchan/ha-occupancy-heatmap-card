@@ -38,7 +38,7 @@
 - Modify: `src/types.ts`
 - Modify: `src/config.ts`
 
-- [ ] **Step 1: Write failing configuration tests**
+- [x] **Step 1: Write failing configuration tests**
 
 Add `start_hour: 0` and `end_hour: 23` to the existing public-default object in `tests/config.test.ts`. Add these cases:
 
@@ -71,7 +71,7 @@ it("rejects an overnight display range", () => {
 
 Add `start_hour: 0` and `end_hour: 23` to the explicit normalized `baseConfig` fixture in `tests/aggregation.test.ts`.
 
-- [ ] **Step 2: Run focused tests and verify RED**
+- [x] **Step 2: Run focused tests and verify RED**
 
 Run:
 
@@ -81,7 +81,7 @@ npx vitest run tests/config.test.ts tests/aggregation.test.ts
 
 Expected: FAIL because the types and normalized defaults do not contain the new properties and invalid ranges are accepted.
 
-- [ ] **Step 3: Add typed fields and validation**
+- [x] **Step 3: Add typed fields and validation**
 
 In `src/types.ts`, add these properties after `days` in the public interface:
 
@@ -130,7 +130,7 @@ start_hour: startHour,
 end_hour: endHour,
 ```
 
-- [ ] **Step 4: Run focused and full tests and verify GREEN**
+- [x] **Step 4: Run focused and full tests and verify GREEN**
 
 Run:
 
@@ -142,7 +142,7 @@ npm run typecheck
 
 Expected: all config cases, existing aggregation tests, the full suite, and strict typing pass.
 
-- [ ] **Step 5: Commit the configuration contract**
+- [x] **Step 5: Commit the configuration contract**
 
 ```bash
 git add src/types.ts src/config.ts tests/config.test.ts tests/aggregation.test.ts
@@ -157,7 +157,7 @@ git commit -m "feat: add display hour configuration"
 - Modify: `src/time-slots.ts`
 - Modify: `src/aggregation.ts`
 
-- [ ] **Step 1: Write failing selected-slot tests**
+- [x] **Step 1: Write failing selected-slot tests**
 
 Extend `createHourlySlots` coverage in `tests/aggregation.test.ts`:
 
@@ -194,7 +194,7 @@ it("keeps actual DST duration for a selected fall-back hour", () => {
 });
 ```
 
-- [ ] **Step 2: Write failing aggregation-scope tests**
+- [x] **Step 2: Write failing aggregation-scope tests**
 
 Add numeric duration, value range, and categorical cases:
 
@@ -263,7 +263,7 @@ it("excludes hidden categorical states from winners and totals", () => {
 });
 ```
 
-- [ ] **Step 3: Run aggregation tests and verify RED**
+- [x] **Step 3: Run aggregation tests and verify RED**
 
 Run:
 
@@ -273,7 +273,7 @@ npx vitest run tests/aggregation.test.ts
 
 Expected: FAIL because slot generation still returns all 24 hours and aggregation does not pass the selected range.
 
-- [ ] **Step 4: Generate only inclusive selected hours**
+- [x] **Step 4: Generate only inclusive selected hours**
 
 Change the `createHourlySlots` signature in `src/time-slots.ts`:
 
@@ -305,7 +305,7 @@ const slots = createHourlySlots(
 );
 ```
 
-- [ ] **Step 5: Run focused/full tests and verify GREEN**
+- [x] **Step 5: Run focused/full tests and verify GREEN**
 
 Run:
 
@@ -317,7 +317,7 @@ npm run typecheck
 
 Expected: slot counts, DST, numeric scope, categorical scope, existing behavior, and strict typing pass.
 
-- [ ] **Step 6: Commit selected-slot aggregation**
+- [x] **Step 6: Commit selected-slot aggregation**
 
 ```bash
 git add src/time-slots.ts src/aggregation.ts tests/aggregation.test.ts
@@ -331,7 +331,7 @@ git commit -m "feat: scope heatmaps to selected hours"
 - Modify: `tests/card.test.ts`
 - Modify: `src/card.ts`
 
-- [ ] **Step 1: Write failing dynamic-grid tests**
+- [x] **Step 1: Write failing dynamic-grid tests**
 
 Add a narrowed-range rendering test while keeping the existing 24-cell default regression:
 
@@ -367,7 +367,7 @@ it("renders only selected hours with relative three-hour labels", async () => {
 });
 ```
 
-- [ ] **Step 2: Write a failing selected-boundary request test**
+- [x] **Step 2: Write a failing selected-boundary request test**
 
 Add:
 
@@ -393,7 +393,7 @@ it("requests history from the oldest selected start hour", async () => {
 });
 ```
 
-- [ ] **Step 3: Run card tests and verify RED**
+- [x] **Step 3: Run card tests and verify RED**
 
 Run:
 
@@ -403,7 +403,7 @@ npx vitest run tests/card.test.ts
 
 Expected: FAIL because the card requests midnight, renders 24 headers/cells, and hard-codes 24 CSS columns.
 
-- [ ] **Step 4: Use selected hours for history loading**
+- [x] **Step 4: Use selected hours for history loading**
 
 In `loadHistory`, call:
 
@@ -419,7 +419,7 @@ const daySlots = createHourlySlots(
 
 The existing `daySlots[0]?.cells[0]?.start` lookup then becomes the selected start boundary.
 
-- [ ] **Step 5: Render dynamic columns and labels**
+- [x] **Step 5: Render dynamic columns and labels**
 
 Change the CSS repeat count:
 
@@ -457,7 +457,7 @@ ${displayedCells.map((cell, index) =>
 )}
 ```
 
-- [ ] **Step 6: Run card/full tests and verify GREEN**
+- [x] **Step 6: Run card/full tests and verify GREEN**
 
 Run:
 
@@ -469,7 +469,7 @@ npm run typecheck
 
 Expected: selected and default cell counts, header labels, history boundary, all existing card states, and typing pass.
 
-- [ ] **Step 7: Commit dynamic card rendering**
+- [x] **Step 7: Commit dynamic card rendering**
 
 ```bash
 git add src/card.ts tests/card.test.ts
@@ -483,7 +483,7 @@ git commit -m "feat: render selected heatmap hours"
 - Modify: `tests/editor.test.ts`
 - Modify: `src/editor.ts`
 
-- [ ] **Step 1: Write failing editor rendering tests**
+- [x] **Step 1: Write failing editor rendering tests**
 
 Extend the required-controls test to assert:
 
@@ -524,7 +524,7 @@ it("disables hour choices that would create an overnight range", async () => {
 });
 ```
 
-- [ ] **Step 2: Write failing editor event tests**
+- [x] **Step 2: Write failing editor event tests**
 
 Add:
 
@@ -553,7 +553,7 @@ it.each([
 });
 ```
 
-- [ ] **Step 3: Run editor tests and verify RED**
+- [x] **Step 3: Run editor tests and verify RED**
 
 Run:
 
@@ -563,7 +563,7 @@ npx vitest run tests/editor.test.ts
 
 Expected: FAIL because neither hour dropdown exists.
 
-- [ ] **Step 4: Render constrained whole-hour dropdowns**
+- [x] **Step 4: Render constrained whole-hour dropdowns**
 
 At the start of `render`, derive:
 
@@ -608,7 +608,7 @@ Add a second `.two-column` block directly after the Days/Data mode block:
 </div>
 ```
 
-- [ ] **Step 5: Run editor/full tests and verify GREEN**
+- [x] **Step 5: Run editor/full tests and verify GREEN**
 
 Run:
 
@@ -620,7 +620,7 @@ npm run typecheck
 
 Expected: dropdown defaults, disabled options, numeric events, all existing editor behavior, full tests, and typing pass.
 
-- [ ] **Step 6: Commit editor controls**
+- [x] **Step 6: Commit editor controls**
 
 ```bash
 git add src/editor.ts tests/editor.test.ts
@@ -637,7 +637,7 @@ git commit -m "feat: configure displayed hours"
 - Modify: `tests/e2e/heatmap.spec.ts`
 - Modify: `docs/images/preview-dark.png`
 
-- [ ] **Step 1: Write failing narrowed-range browser assertions**
+- [x] **Step 1: Write failing narrowed-range browser assertions**
 
 In the existing theme test, scope the value-intensity card and assert its narrowed count and headers:
 
@@ -657,7 +657,7 @@ Update the all-card count from `504` to `441`: 105 narrowed numeric-value cells 
 
 In the mobile-only assertion, keep the narrowed value card as the selected card and assert its matrix still scrolls horizontally at the Pixel 7 viewport.
 
-- [ ] **Step 2: Run the focused browser test and verify RED**
+- [x] **Step 2: Run the focused browser test and verify RED**
 
 Run:
 
@@ -667,7 +667,7 @@ npx playwright test tests/e2e/heatmap.spec.ts --project=desktop --grep="dark das
 
 Expected: FAIL because the mock numeric-value card still renders all 168 cells and its headers begin at 0.
 
-- [ ] **Step 3: Configure the mocked narrowed range**
+- [x] **Step 3: Configure the mocked narrowed range**
 
 Add to `numericValueCard.setConfig` in `demo/main.ts`:
 
@@ -678,7 +678,7 @@ end_hour: 23,
 
 Leave the duration and categorical preview cards at their default `0-23` ranges to demonstrate backward compatibility.
 
-- [ ] **Step 4: Document hour-range configuration and Telegram community**
+- [x] **Step 4: Document hour-range configuration and Telegram community**
 
 Add this to the numeric YAML examples in `README.md`:
 
@@ -714,7 +714,7 @@ Add near the end of the README:
 
 Add a `0.3.0 - 2026-07-28` changelog section covering selected display hours, calculation scoping, dynamic grid/editor controls, and the community link.
 
-- [ ] **Step 5: Run browser coverage and refresh preview**
+- [x] **Step 5: Run browser coverage and refresh preview**
 
 Run:
 
@@ -725,7 +725,7 @@ npm run test:e2e
 
 Expected: desktop/mobile light/dark scenarios pass; the narrowed value card has 105 cells, correct headers, usable details, no page overflow, and mobile matrix scrolling; `docs/images/preview-dark.png` is refreshed.
 
-- [ ] **Step 6: Commit docs and browser harness**
+- [x] **Step 6: Commit docs and browser harness**
 
 ```bash
 git add README.md CHANGELOG.md demo/main.ts tests/e2e/heatmap.spec.ts docs/images/preview-dark.png
@@ -742,7 +742,7 @@ git commit -m "docs: explain display hour ranges"
 - Modify: `dist/ha-occupancy-heatmap-card.js.map`
 - Modify: `docs/superpowers/plans/2026-07-28-display-hour-range.md`
 
-- [ ] **Step 1: Bump package metadata**
+- [x] **Step 1: Bump package metadata**
 
 Run:
 
@@ -752,7 +752,7 @@ npm version 0.3.0 --no-git-tag-version
 
 Expected: package and lockfile versions become `0.3.0` without creating a commit or tag.
 
-- [ ] **Step 2: Run the complete local release gate**
+- [x] **Step 2: Run the complete local release gate**
 
 Run:
 
