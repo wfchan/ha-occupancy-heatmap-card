@@ -35,6 +35,12 @@ export class HistoryService {
         states: history[entityId] ?? [],
         stale: requestGeneration !== this.generation,
       }))
+      .catch((error: unknown): HistoryLoadResult => {
+        if (requestGeneration !== this.generation) {
+          return { states: [], stale: true };
+        }
+        throw error;
+      })
       .finally(() => {
         if (this.pending.get(key) === request) {
           this.pending.delete(key);

@@ -1,0 +1,132 @@
+:root {
+  color-scheme: light;
+  --primary-color: #1687a7;
+  --primary-text-color: #17242c;
+  --secondary-text-color: #66727b;
+  --card-background-color: #ffffff;
+  --ha-card-background: #ffffff;
+  --divider-color: #b9c3ca;
+  --error-color: #c53d48;
+  background: #edf1f3;
+  color: var(--primary-text-color);
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-synthesis: none;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --primary-color: #42c7db;
+  --primary-text-color: #eef5f7;
+  --secondary-text-color: #9cadb6;
+  --card-background-color: #111c25;
+  --ha-card-background: #111c25;
+  --divider-color: #40515d;
+  --error-color: #ff7480;
+  background: #091219;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 0;
+  min-height: 100vh;
+  margin: 0;
+  background:
+    linear-gradient(
+      color-mix(in srgb, var(--primary-color) 5%, transparent) 1px,
+      transparent 1px
+    ),
+    var(--page-background, transparent);
+  background-size: 100% 32px;
+}
+
+.topbar {
+  display: flex;
+  min-height: 58px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 0 24px;
+  border-bottom: 1px solid color-mix(in srgb, var(--divider-color) 55%, transparent);
+  background: color-mix(in srgb, var(--card-background-color) 88%, transparent);
+}
+
+.topbar div {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.topbar strong {
+  overflow-wrap: anywhere;
+  font-size: 15px;
+}
+
+.topbar span {
+  color: var(--secondary-text-color);
+  font-size: 12px;
+}
+
+.connection {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 7px;
+}
+
+.connection i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #4fbd7b;
+}
+
+main {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  width: min(1540px, 100%);
+  margin: 0 auto;
+  padding: 24px;
+}
+
+occupancy-heatmap-card {
+  min-width: 0;
+}
+
+@media (max-width: 1120px) {
+  main {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .topbar {
+    align-items: flex-start;
+    padding: 14px 16px;
+  }
+
+  .topbar div {
+    display: grid;
+    gap: 2px;
+  }
+
+  .connection {
+    margin-top: 4px;
+  }
+
+  main {
+    gap: 14px;
+    padding: 14px 10px 24px;
+  }
+}

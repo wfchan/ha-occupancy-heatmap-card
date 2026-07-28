@@ -62,6 +62,29 @@ describe("OccupancyHeatmapCard", () => {
     ).toContain("Loading history");
   });
 
+  it("does not reissue a pending history request when the entity is unchanged", async () => {
+    const pending = deferred<HistoryStates>();
+    const homeAssistant = hass(pending.promise);
+    const callWS = vi.spyOn(homeAssistant, "callWS");
+    const card = document.createElement("occupancy-heatmap-card") as OccupancyHeatmapCard;
+    card.setConfig({ entity: "sensor.room" });
+    card.hass = homeAssistant;
+    document.body.append(card);
+    await card.updateComplete;
+
+    vi.setSystemTime(new Date("2026-07-28T01:00:01+08:00"));
+    card.hass = homeAssistant;
+    await card.updateComplete;
+
+    expect(callWS).toHaveBeenCalledTimes(1);
+  });
+
+  it("selects a suggested entity for stub configuration", () => {
+    expect(
+      OccupancyHeatmapCard.getStubConfig(hass(Promise.resolve({})), ["sensor.room"])
+    ).toMatchObject({ entity: "sensor.room", days: 7, mode: "auto" });
+  });
+
   it("renders 24 numeric cells per day and an occupied summary", async () => {
     const history = Promise.resolve({
       "sensor.room": [

@@ -19,6 +19,22 @@ const hass: HomeAssistant = {
 };
 
 describe("OccupancyHeatmapCardEditor", () => {
+  it("renders entity options when hass is assigned after the first render", async () => {
+    const editor = document.createElement(
+      "occupancy-heatmap-card-editor"
+    ) as OccupancyHeatmapCardEditor;
+    editor.setConfig({ entity: "sensor.room" });
+    document.body.append(editor);
+    await editor.updateComplete;
+
+    expect(editor.shadowRoot?.querySelector("option[value='sensor.room']")).toBeNull();
+
+    editor.hass = hass;
+    await editor.updateComplete;
+
+    expect(editor.shadowRoot?.querySelector("option[value='sensor.room']")).toBeTruthy();
+  });
+
   it("renders the required configuration controls", async () => {
     const editor = document.createElement(
       "occupancy-heatmap-card-editor"

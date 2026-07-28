@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Occupancy Heatmap Card</title>
+    <link rel="stylesheet" href="/demo/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <strong>Occupancy Heatmap Card</strong>
+        <span>Home Assistant preview</span>
+      </div>
+      <span class="connection"><i></i> Mock recorder connected</span>
+    </header>
+    <main>
+      <occupancy-heatmap-card id="numeric-card"></occupancy-heatmap-card>
+      <occupancy-heatmap-card id="categorical-card"></occupancy-heatmap-card>
+    </main>
+    <script type="module" src="/demo/main.ts"></script>
+  </body>
+</html>

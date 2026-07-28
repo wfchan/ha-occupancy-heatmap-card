@@ -12,31 +12,31 @@
 
 ### Task 1: Repository and scaffold
 
-- [ ] Configure the package, strict TypeScript, Rollup, linting, formatting, Vitest, and Playwright.
-- [ ] Add MIT license, HACS metadata, CI/release workflows, README, and contribution guidance.
-- [ ] Test and register a minimal loadable custom card, build the distribution asset, and commit the scaffold.
-- [ ] Create and push the public GitHub repository before feature work.
+- [x] Configure the package, strict TypeScript, Rollup, linting, formatting, Vitest, and Playwright.
+- [x] Add MIT license, HACS metadata, CI/release workflows, README, and contribution guidance.
+- [x] Test and register a minimal loadable custom card, build the distribution asset, and commit the scaffold.
+- [x] Create and push the public GitHub repository before feature work.
 
 ### Task 2: Configuration
 
-- [ ] Write failing tests for defaults, range validation, required entity, mode selection, and excluded states.
-- [ ] Implement the typed public configuration and mode detection.
-- [ ] Run focused and full tests, then commit.
+- [x] Write failing tests for defaults, range validation, required entity, mode selection, and excluded states.
+- [x] Implement the typed public configuration and mode detection.
+- [x] Run focused and full tests, then commit.
 
 ### Task 3: History and aggregation
 
-- [ ] Write failing tests for request parameters, deduplication, stale results, boundary carry-forward, thresholds, categorical winners, ties, future slots, 1/7/31-day ranges, and DST.
-- [ ] Implement the history service, timezone slots, and pure aggregator.
-- [ ] Run focused and full tests, then commit.
+- [x] Write failing tests for request parameters, deduplication, stale results, boundary carry-forward, thresholds, categorical winners, ties, future slots, 1/7/31-day ranges, and DST.
+- [x] Implement the history service, timezone slots, and pure aggregator.
+- [x] Run focused and full tests, then commit.
 
 ### Task 4: Card and editor
 
-- [ ] Write failing component tests for loading, empty, error, numeric, categorical, editor, and config-change states.
-- [ ] Implement the reference-inspired responsive card and visual editor.
-- [ ] Run focused and full tests, then commit.
+- [x] Write failing component tests for loading, empty, error, numeric, categorical, editor, and config-change states.
+- [x] Implement the reference-inspired responsive card and visual editor.
+- [x] Run focused and full tests, then commit.
 
 ### Task 5: Browser verification and release
 
-- [ ] Build a mocked Home Assistant browser harness with numeric/categorical and light/dark fixtures.
-- [ ] Verify desktop and mobile screenshots, overflow, focus, tap details, and text bounds with Playwright.
+- [x] Build a mocked Home Assistant browser harness with numeric/categorical and light/dark fixtures.
+- [x] Verify desktop and mobile screenshots, overflow, focus, tap details, and text bounds with Playwright.
 - [ ] Complete README examples, run the entire verification suite, commit `dist`, and publish `v0.1.0`.

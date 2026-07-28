@@ -5,10 +5,12 @@ import type { HistoryStates, HomeAssistant } from "../src/types";
 
 function deferred<T>() {
   let resolve!: (value: T) => void;
-  const promise = new Promise<T>((done) => {
+  let reject!: (reason?: unknown) => void;
+  const promise = new Promise<T>((done, fail) => {
     resolve = done;
+    reject = fail;
   });
-  return { promise, resolve };
+  return { promise, reject, resolve };
 }
 
 function createHass(
@@ -90,5 +92,38 @@ describe("HistoryService", () => {
       stale: false,
     });
     await expect(first).resolves.toEqual({ states: [{ s: "1", lu: 1 }], stale: true });
+  });
+
+  it("marks an older rejected request stale after a newer request succeeds", async () => {
+    const older = deferred<HistoryStates>();
+    const newer = deferred<HistoryStates>();
+    const callWS = vi
+      .fn()
+      .mockReturnValueOnce(older.promise)
+      .mockReturnValueOnce(newer.promise);
+    const service = new HistoryService();
+    const hass = createHass(callWS);
+    const end = new Date("2026-07-28T00:00:00Z");
+
+    const first = service.load(
+      hass,
+      "sensor.room",
+      new Date("2026-07-21T00:00:00Z"),
+      end
+    );
+    const second = service.load(
+      hass,
+      "sensor.other",
+      new Date("2026-07-21T00:00:00Z"),
+      end
+    );
+    newer.resolve({ "sensor.other": [{ s: "Kitchen", lu: 2 }] });
+    await expect(second).resolves.toEqual({
+      states: [{ s: "Kitchen", lu: 2 }],
+      stale: false,
+    });
+    older.reject(new Error("Old recorder failure"));
+
+    await expect(first).resolves.toEqual({ states: [], stale: true });
   });
 });

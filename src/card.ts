@@ -18,9 +18,10 @@ export class OccupancyHeatmapCard extends LitElement {
   static override styles = css`
     :host {
       display: block;
-      --heatmap-cell-size: 23px;
-      --heatmap-gap: 5px;
-      --heatmap-label-width: 72px;
+      container-type: inline-size;
+      --heatmap-cell-size: 18px;
+      --heatmap-gap: 3px;
+      --heatmap-label-width: 60px;
       --heatmap-empty: color-mix(
         in srgb,
         var(--secondary-text-color, #727b88) 16%,
@@ -285,6 +286,14 @@ export class OccupancyHeatmapCard extends LitElement {
       }
     }
 
+    @container (min-width: 820px) {
+      :host {
+        --heatmap-cell-size: 23px;
+        --heatmap-gap: 5px;
+        --heatmap-label-width: 72px;
+      }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       .cell {
         transition: none;
@@ -320,7 +329,11 @@ export class OccupancyHeatmapCard extends LitElement {
     this._hass = value;
     this.requestUpdate("hass", previous);
 
-    if (this.config && value && (!this.data || previousChanged !== nextChanged)) {
+    if (
+      this.config &&
+      value &&
+      (this.viewState === "idle" || previousChanged !== nextChanged)
+    ) {
       void this.loadHistory();
     }
   }
@@ -353,8 +366,14 @@ export class OccupancyHeatmapCard extends LitElement {
     return document.createElement("occupancy-heatmap-card-editor");
   }
 
-  static getStubConfig(): OccupancyHeatmapCardConfig {
-    return { entity: "", days: 7, mode: "auto" };
+  static getStubConfig(
+    hass?: HomeAssistant,
+    entities?: string[],
+    entitiesFallback?: string[]
+  ): OccupancyHeatmapCardConfig {
+    const entity =
+      entities?.[0] ?? entitiesFallback?.[0] ?? Object.keys(hass?.states ?? {})[0] ?? "";
+    return { entity, days: 7, mode: "auto" };
   }
 
   getCardSize(): number {
@@ -547,11 +566,11 @@ export class OccupancyHeatmapCard extends LitElement {
                         <span
                           class="swatch"
                           style=${styleMap({
-                          "--state-color": getStateColor(
-                            state,
-                            this.config!.state_colors
-                          ),
-                        })}
+                            "--state-color": getStateColor(
+                              state,
+                              this.config!.state_colors
+                            ),
+                          })}
                         ></span>
                         ${state}
                       </span>`

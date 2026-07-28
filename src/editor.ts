@@ -141,9 +141,19 @@ export class OccupancyHeatmapCardEditor extends LitElement {
     }
   `;
 
-  hass?: HomeAssistant;
+  private _hass?: HomeAssistant;
   private config: OccupancyHeatmapCardConfig = {};
   private draftState = "";
+
+  get hass(): HomeAssistant | undefined {
+    return this._hass;
+  }
+
+  set hass(value: HomeAssistant | undefined) {
+    const previous = this._hass;
+    this._hass = value;
+    this.requestUpdate("hass", previous);
+  }
 
   setConfig(config: OccupancyHeatmapCardConfig): void {
     this.config = { ...config };

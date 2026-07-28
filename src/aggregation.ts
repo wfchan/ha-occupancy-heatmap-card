@@ -82,6 +82,7 @@ export function aggregateHistory({
   const intervals = createIntervals(history, now.getTime());
   const legendStates: string[] = [];
   const seenStates = new Set<string>();
+  let firstIntervalIndex = 0;
   let totalSeconds = 0;
 
   const days = slots.map<HeatmapDay>((day) => ({
@@ -96,9 +97,18 @@ export function aggregateHistory({
         return { ...slot, occupiedSeconds: 0, intensity: 0, future };
       }
 
+      while (
+        firstIntervalIndex < intervals.length &&
+        intervals[firstIntervalIndex]!.end <= slotStart
+      ) {
+        firstIntervalIndex += 1;
+      }
+
       if (mode === "numeric") {
         let occupiedSeconds = 0;
-        for (const interval of intervals) {
+        for (let index = firstIntervalIndex; index < intervals.length; index += 1) {
+          const interval = intervals[index]!;
+          if (interval.start >= effectiveEnd) break;
           if (
             excluded.has(interval.state) ||
             Number(interval.state) <= config.numeric_threshold
@@ -121,7 +131,9 @@ export function aggregateHistory({
 
       const durations = new Map<string, { seconds: number; latestStart: number }>();
       let validSeconds = 0;
-      for (const interval of intervals) {
+      for (let index = firstIntervalIndex; index < intervals.length; index += 1) {
+        const interval = intervals[index]!;
+        if (interval.start >= effectiveEnd) break;
         if (!interval.state.trim() || excluded.has(interval.state)) {
           continue;
         }
