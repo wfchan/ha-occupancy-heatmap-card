@@ -22,9 +22,17 @@ for (const theme of ["light", "dark"] as const) {
     const cards = page.locator("occupancy-heatmap-card");
     await expect(cards).toHaveCount(3);
     const cells = page.locator("occupancy-heatmap-card button.cell");
-    await expect(cells).toHaveCount(504);
+    await expect(cells).toHaveCount(441);
 
     const numericCard = page.locator("occupancy-heatmap-card#numeric-value-card");
+    await expect(numericCard.locator("button.cell")).toHaveCount(105);
+    await expect(numericCard.locator(".hour-label[role='columnheader']")).toHaveText([
+      "9",
+      "12",
+      "15",
+      "18",
+      "21",
+    ]);
     const numericCell = numericCard.locator("button.cell.filled:not(:disabled)").first();
     await numericCell.click();
     await expect(numericCard.locator(".details")).toContainText(/\d+(\.\d+)? people/);
@@ -96,7 +104,7 @@ test("mobile keeps the page fitted and scrolls only the heatmap matrix", async (
   ).toBeVisible();
 
   const fit = await page.evaluate(() => {
-    const card = document.querySelector("occupancy-heatmap-card");
+    const card = document.querySelector("occupancy-heatmap-card#numeric-value-card");
     const scroll = card?.shadowRoot?.querySelector(".scroll");
     if (!(scroll instanceof HTMLElement))
       throw new Error("Heatmap scroll region missing");

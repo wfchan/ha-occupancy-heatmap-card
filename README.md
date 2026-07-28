@@ -27,6 +27,8 @@ type: custom:occupancy-heatmap-card
 entity: sensor.living_room_people
 title: Living room activity
 days: 7
+start_hour: 9
+end_hour: 23
 mode: numeric
 numeric_threshold: 0
 numeric_intensity: duration
@@ -42,6 +44,8 @@ type: custom:occupancy-heatmap-card
 entity: sensor.living_room_people
 title: Living room person count
 days: 7
+start_hour: 9
+end_hour: 23
 mode: numeric
 numeric_threshold: 0
 numeric_intensity: value
@@ -83,6 +87,12 @@ Worked examples:
 - A sensor reporting `1` for 45 minutes and `3` for 15 minutes produces `(1 * 45 + 3 * 15) / 60 = 1.5`.
 - With a threshold of `0`, a sensor reporting `0` for 30 minutes and `2` for 30 minutes produces a weighted occupied value of `2` and an occupied duration of 30 minutes. The below-threshold period does not dilute the weighted value.
 
+## Display hour range
+
+`start_hour` and `end_hour` select an inclusive same-day range of whole hours. Both default to the full day (`0-23`) and accept integers from `0` through `23`. The start must be less than or equal to the end, so overnight ranges are not supported. A range such as `9-23` displays 15 cells per day; `9-9` displays one.
+
+Hidden hours do not affect occupied or recorded summaries, categorical winners, or numeric value normalization.
+
 ## Categorical sensor
 
 The longest-duration state supplies each cell's color. Its duration supplies the intensity. Equal durations use the state active most recently.
@@ -110,6 +120,8 @@ show_legend: true
 | `entity`            | string      | required                 | Entity whose recorder history is displayed.           |
 | `title`             | string      | entity name              | Card heading.                                         |
 | `days`              | integer     | `7`                      | Number of local calendar days, from 1 through 31.     |
+| `start_hour`        | integer     | `0`                      | First displayed hour, inclusive.                      |
+| `end_hour`          | integer     | `23`                     | Last displayed hour, inclusive.                       |
 | `mode`              | string      | `auto`                   | `auto`, `numeric`, or `categorical`.                  |
 | `numeric_threshold` | number      | `0`                      | Numeric states strictly above this count as occupied. |
 | `numeric_intensity` | string      | `duration`               | `duration` or `value` color scaling.                  |
@@ -134,6 +146,10 @@ npm run test:e2e
 ```
 
 Run `npm run dev` to open the mocked Home Assistant preview. Design and implementation records live in [`docs/superpowers`](docs/superpowers).
+
+## Community
+
+[Telegram Group](https://t.me/smarthomehk)
 
 ## License
 

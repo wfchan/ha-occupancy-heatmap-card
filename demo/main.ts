@@ -96,6 +96,8 @@ numericValueCard.setConfig({
   entity: "sensor.living_room_activity",
   title: "Activity by sensor value",
   days: 7,
+  start_hour: 9,
+  end_hour: 23,
   mode: "numeric",
   numeric_threshold: 0,
   numeric_intensity: "value",

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0 - 2026-07-28
+
+- Add inclusive same-day display hour ranges from `0` through `23`.
+- Scope summaries, categorical winners, and numeric value normalization to displayed hours.
+- Render dynamic heatmap columns and add constrained start/end hour editor controls.
+- Add the Telegram community group to the project documentation.
+
 ## 0.2.0 - 2026-07-28
 
 - Add selectable occupied-duration or sensor-value color intensity for numeric heatmaps.
