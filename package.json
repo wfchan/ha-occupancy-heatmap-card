@@ -1,6 +1,6 @@
 {
   "name": "ha-occupancy-heatmap-card",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Duration-based numeric and categorical heatmaps for Home Assistant",
   "type": "module",
   "main": "dist/ha-occupancy-heatmap-card.js",

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.1 - 2026-07-28
+
+- Replace the entity dropdown with Home Assistant's searchable entity picker.
+
 ## 0.1.0 - 2026-07-28
 
 - Add numeric threshold occupancy with duration-based intensity.

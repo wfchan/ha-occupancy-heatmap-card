@@ -17,7 +17,7 @@
 - Modify: `tests/editor.test.ts`
 - Modify: `src/editor.ts`
 
-- [ ] **Step 1: Write failing picker rendering and selection tests**
+- [x] **Step 1: Write failing picker rendering and selection tests**
 
 Replace the existing late-`hass` entity option test and entity-control assertion, then add a selection event test:
 
@@ -83,7 +83,7 @@ with:
 expect(editor.shadowRoot?.querySelector("ha-entity-picker")).toBeTruthy();
 ```
 
-- [ ] **Step 2: Run the focused test and verify RED**
+- [x] **Step 2: Run the focused test and verify RED**
 
 Run:
 
@@ -93,7 +93,7 @@ npx vitest run tests/editor.test.ts
 
 Expected: the picker tests fail because the editor still renders `select[name="entity"]` and no `ha-entity-picker` exists.
 
-- [ ] **Step 3: Implement the native entity picker**
+- [x] **Step 3: Implement the native entity picker**
 
 Add picker sizing to `OccupancyHeatmapCardEditor.styles`:
 
@@ -124,7 +124,7 @@ Remove the unused sorted `entities` variable from `render()`. Replace the entity
 
 Do not add `allow-custom-entity`; users must select an entity returned by Home Assistant.
 
-- [ ] **Step 4: Run focused and full checks and verify GREEN**
+- [x] **Step 4: Run focused and full checks and verify GREEN**
 
 Run:
 
@@ -138,7 +138,7 @@ npm audit
 
 Expected: all editor tests, 38 total unit/component tests, the build, five applicable browser tests, HACS-related project checks, and the audit pass.
 
-- [ ] **Step 5: Commit the editor change**
+- [x] **Step 5: Commit the editor change**
 
 ```bash
 git add src/editor.ts tests/editor.test.ts dist/ha-occupancy-heatmap-card.js dist/ha-occupancy-heatmap-card.js.map
@@ -156,7 +156,7 @@ git commit -m "feat: add searchable entity picker"
 - Modify: `dist/ha-occupancy-heatmap-card.js`
 - Modify: `dist/ha-occupancy-heatmap-card.js.map`
 
-- [ ] **Step 1: Bump the package version and changelog**
+- [x] **Step 1: Bump the package version and changelog**
 
 Run:
 
@@ -172,7 +172,7 @@ Add above the `0.1.0` section in `CHANGELOG.md`:
 - Replace the entity dropdown with Home Assistant's searchable entity picker.
 ```
 
-- [ ] **Step 2: Rebuild and run release verification**
+- [x] **Step 2: Rebuild and run release verification**
 
 Run:
 
@@ -187,7 +187,7 @@ git diff --check
 
 Expected: formatting, lint, strict type checking, 38 unit/component tests, the production build, five applicable browser tests, both audits, and whitespace validation pass.
 
-- [ ] **Step 3: Commit the release preparation**
+- [x] **Step 3: Commit the release preparation**
 
 Mark the completed implementation and local-verification checkboxes in this file as `[x]`, then run:
 
