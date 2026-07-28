@@ -33,4 +33,3 @@ Invalid configuration throws an actionable configuration error. A missing entity
 ## Distribution
 
 Publish an MIT-licensed public repository at `wfchan/ha-occupancy-heatmap-card`. The default branch includes a built distribution file for immediate custom-repository installation. GitHub Actions verifies formatting, linting, types, tests, production output, and HACS metadata. Release `v0.1.0` only after the full verification suite passes.
-

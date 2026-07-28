@@ -40,4 +40,3 @@
 - [ ] Build a mocked Home Assistant browser harness with numeric/categorical and light/dark fixtures.
 - [ ] Verify desktop and mobile screenshots, overflow, focus, tap details, and text bounds with Playwright.
 - [ ] Complete README examples, run the entire verification suite, commit `dist`, and publish `v0.1.0`.
-
