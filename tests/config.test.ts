@@ -11,6 +11,7 @@ describe("normalizeConfig", () => {
       days: 7,
       mode: "auto",
       numeric_threshold: 0,
+      numeric_intensity: "duration",
       numeric_color: "#03a9f4",
       state_colors: {},
       excluded_states: ["unknown", "unavailable"],
@@ -32,6 +33,22 @@ describe("normalizeConfig", () => {
     expect(() =>
       normalizeConfig({ entity: "sensor.room", mode: "continuous" as "auto" })
     ).toThrow("Mode must be auto, numeric, or categorical");
+  });
+
+  it("preserves a value numeric intensity", () => {
+    expect(
+      normalizeConfig({ entity: "sensor.room", numeric_intensity: "value" })
+        .numeric_intensity
+    ).toBe("value");
+  });
+
+  it("rejects an unsupported numeric intensity", () => {
+    expect(() =>
+      normalizeConfig({
+        entity: "sensor.room",
+        numeric_intensity: "average" as "duration",
+      })
+    ).toThrow("Numeric intensity must be duration or value");
   });
 
   it("deduplicates and trims excluded states", () => {

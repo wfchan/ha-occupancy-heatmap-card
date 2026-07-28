@@ -1,11 +1,13 @@
 import type {
   HeatmapMode,
+  NumericIntensity,
   NormalizedOccupancyHeatmapCardConfig,
   OccupancyHeatmapCardConfig,
   ResolvedHeatmapMode,
 } from "./types";
 
 const MODES = new Set<HeatmapMode>(["auto", "numeric", "categorical"]);
+const NUMERIC_INTENSITIES = new Set<NumericIntensity>(["duration", "value"]);
 
 export function normalizeConfig(
   config: OccupancyHeatmapCardConfig
@@ -30,6 +32,11 @@ export function normalizeConfig(
     throw new Error("Numeric threshold must be a finite number");
   }
 
+  const numericIntensity = config.numeric_intensity ?? "duration";
+  if (!NUMERIC_INTENSITIES.has(numericIntensity)) {
+    throw new Error("Numeric intensity must be duration or value");
+  }
+
   const excludedStates = Array.from(
     new Set(
       (config.excluded_states ?? ["unknown", "unavailable"])
@@ -45,6 +52,7 @@ export function normalizeConfig(
     days,
     mode,
     numeric_threshold: threshold,
+    numeric_intensity: numericIntensity,
     numeric_color: config.numeric_color?.trim() || "#03a9f4",
     state_colors: { ...(config.state_colors ?? {}) },
     excluded_states: excludedStates,

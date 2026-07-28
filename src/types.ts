@@ -1,5 +1,6 @@
 export type HeatmapMode = "auto" | "numeric" | "categorical";
 export type ResolvedHeatmapMode = Exclude<HeatmapMode, "auto">;
+export type NumericIntensity = "duration" | "value";
 
 export interface OccupancyHeatmapCardConfig {
   type?: string;
@@ -8,6 +9,7 @@ export interface OccupancyHeatmapCardConfig {
   days?: number;
   mode?: HeatmapMode;
   numeric_threshold?: number;
+  numeric_intensity?: NumericIntensity;
   numeric_color?: string;
   state_colors?: Record<string, string>;
   excluded_states?: string[];
@@ -21,6 +23,7 @@ export interface NormalizedOccupancyHeatmapCardConfig {
   days: number;
   mode: HeatmapMode;
   numeric_threshold: number;
+  numeric_intensity: NumericIntensity;
   numeric_color: string;
   state_colors: Record<string, string>;
   excluded_states: string[];

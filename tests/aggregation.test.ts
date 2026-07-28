@@ -11,6 +11,7 @@ const baseConfig: NormalizedOccupancyHeatmapCardConfig = {
   days: 1,
   mode: "numeric",
   numeric_threshold: 0,
+  numeric_intensity: "duration",
   numeric_color: "#03a9f4",
   state_colors: {},
   excluded_states: ["unknown", "unavailable"],
