@@ -1,6 +1,11 @@
 import { css, html, LitElement, nothing } from "lit";
 
-import type { HeatmapMode, HomeAssistant, OccupancyHeatmapCardConfig } from "./types";
+import type {
+  HeatmapMode,
+  HomeAssistant,
+  NumericIntensity,
+  OccupancyHeatmapCardConfig,
+} from "./types";
 
 export class OccupancyHeatmapCardEditor extends LitElement {
   static override styles = css`
@@ -270,6 +275,20 @@ export class OccupancyHeatmapCardEditor extends LitElement {
         mode !== "categorical"
           ? html`<section class="section">
               <h3>Numeric occupancy</h3>
+              <label>
+                Color intensity
+                <select
+                  name="numeric_intensity"
+                  .value=${this.config.numeric_intensity ?? "duration"}
+                  @change=${(event: Event) =>
+                    this.emit({
+                      numeric_intensity: this.value(event) as NumericIntensity,
+                    })}
+                >
+                  <option value="duration">Occupied time</option>
+                  <option value="value">Sensor value</option>
+                </select>
+              </label>
               <div class="two-column">
                 <label>
                   Above threshold

@@ -76,7 +76,45 @@ describe("OccupancyHeatmapCardEditor", () => {
     expect(
       editor.shadowRoot?.querySelector("input[name='numeric_threshold']")
     ).toBeTruthy();
+    expect(
+      editor.shadowRoot?.querySelector("select[name='numeric_intensity']")
+    ).toBeTruthy();
     expect(editor.shadowRoot?.querySelector("input[name='numeric_color']")).toBeTruthy();
+  });
+
+  it("emits sensor value intensity changes", async () => {
+    const editor = document.createElement(
+      "occupancy-heatmap-card-editor"
+    ) as OccupancyHeatmapCardEditor;
+    editor.hass = hass;
+    editor.setConfig({ entity: "sensor.room", mode: "numeric" });
+    document.body.append(editor);
+    await editor.updateComplete;
+    const listener = vi.fn();
+    editor.addEventListener("config-changed", listener);
+    const select = editor.shadowRoot?.querySelector<HTMLSelectElement>(
+      "select[name='numeric_intensity']"
+    );
+    if (!select) throw new Error("Numeric intensity selector missing");
+
+    select.value = "value";
+    select.dispatchEvent(new Event("change", { bubbles: true, composed: true }));
+
+    expect(listener).toHaveBeenCalledOnce();
+    expect(listener.mock.calls[0]?.[0].detail.config.numeric_intensity).toBe("value");
+  });
+
+  it("hides numeric intensity in categorical mode", async () => {
+    const editor = document.createElement(
+      "occupancy-heatmap-card-editor"
+    ) as OccupancyHeatmapCardEditor;
+    editor.setConfig({ entity: "sensor.room", mode: "categorical" });
+    document.body.append(editor);
+    await editor.updateComplete;
+
+    expect(
+      editor.shadowRoot?.querySelector("select[name='numeric_intensity']")
+    ).toBeNull();
   });
 
   it("emits config-changed with normalized numeric controls", async () => {
