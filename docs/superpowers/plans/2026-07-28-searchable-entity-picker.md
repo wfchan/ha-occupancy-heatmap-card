@@ -196,7 +196,7 @@ git add package.json package-lock.json CHANGELOG.md dist/ha-occupancy-heatmap-ca
 git commit -m "chore: prepare v0.1.1"
 ```
 
-- [ ] **Step 4: Push and validate hosted checks**
+- [x] **Step 4: Push and validate hosted checks**
 
 Run:
 
@@ -208,7 +208,7 @@ gh run watch "$CI_RUN_ID" --repo wfchan/ha-occupancy-heatmap-card --exit-status
 
 Expected: both `verify` and `hacs` jobs pass for the pushed commit.
 
-- [ ] **Step 5: Publish and verify `v0.1.1`**
+- [x] **Step 5: Publish and verify `v0.1.1`**
 
 Run:
 
@@ -221,7 +221,7 @@ gh release view v0.1.1 --repo wfchan/ha-occupancy-heatmap-card --json url,assets
 
 Expected: the release workflow passes and `ha-occupancy-heatmap-card.js` is attached to the public `v0.1.1` release.
 
-- [ ] **Step 6: Record plan completion**
+- [x] **Step 6: Record plan completion**
 
 Mark all remaining checkboxes in this file as `[x]`, then run:
 
