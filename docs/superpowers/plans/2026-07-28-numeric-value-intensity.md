@@ -37,7 +37,7 @@
 - Modify: `src/types.ts`
 - Modify: `src/config.ts`
 
-- [ ] **Step 1: Write failing configuration tests**
+- [x] **Step 1: Write failing configuration tests**
 
 In `tests/config.test.ts`, add the default to the existing full-object assertion and add accepted/rejected value tests:
 
@@ -75,7 +75,7 @@ it("rejects an unsupported numeric intensity", () => {
 
 Add `numeric_intensity: "duration"` to `baseConfig` in `tests/aggregation.test.ts` so its explicit normalized fixture stays type-correct.
 
-- [ ] **Step 2: Run the focused tests and verify RED**
+- [x] **Step 2: Run the focused tests and verify RED**
 
 Run:
 
@@ -85,7 +85,7 @@ npx vitest run tests/config.test.ts tests/aggregation.test.ts
 
 Expected: FAIL because `numeric_intensity` is not part of the config types or normalized output.
 
-- [ ] **Step 3: Implement the typed option and validation**
+- [x] **Step 3: Implement the typed option and validation**
 
 In `src/types.ts`, add the type beside `HeatmapMode`, add the optional property after `numeric_color` in `OccupancyHeatmapCardConfig`, and add the required property after `numeric_color` in `NormalizedOccupancyHeatmapCardConfig`:
 
@@ -113,7 +113,7 @@ return {
 };
 ```
 
-- [ ] **Step 4: Run focused tests and verify GREEN**
+- [x] **Step 4: Run focused tests and verify GREEN**
 
 Run:
 
@@ -123,7 +123,7 @@ npx vitest run tests/config.test.ts tests/aggregation.test.ts
 
 Expected: PASS with the duration default and value validation covered.
 
-- [ ] **Step 5: Commit the configuration contract**
+- [x] **Step 5: Commit the configuration contract**
 
 ```bash
 git add src/types.ts src/config.ts tests/config.test.ts tests/aggregation.test.ts
@@ -137,7 +137,7 @@ git commit -m "feat: add numeric intensity configuration"
 - Modify: `tests/aggregation.test.ts`
 - Modify: `src/aggregation.ts`
 
-- [ ] **Step 1: Write failing weighted-value tests**
+- [x] **Step 1: Write failing weighted-value tests**
 
 Add focused tests using `{ ...baseConfig, numeric_intensity: "value" as const }`:
 
@@ -176,7 +176,7 @@ it("does not let below-threshold time dilute the occupied value", () => {
 
 Add a global range case containing three occupied hours with weighted values `1`, `2`, and `3`; assert cell intensities `0`, `0.5`, and `1` and `numericRange: { min: 1, max: 3 }`. Include an excluded/non-numeric transition inside an hour and assert it contributes neither duration nor weighted numerator. Assert future cells have no `numericValue` and do not change the range.
 
-- [ ] **Step 2: Run the aggregation test and verify RED**
+- [x] **Step 2: Run the aggregation test and verify RED**
 
 Run:
 
@@ -186,7 +186,7 @@ npx vitest run tests/aggregation.test.ts
 
 Expected: FAIL because cells do not expose `numericValue`, heatmap data has no `numericRange`, and intensity still uses occupied duration.
 
-- [ ] **Step 3: Compute occupied weighted values in the first pass**
+- [x] **Step 3: Compute occupied weighted values in the first pass**
 
 In `src/aggregation.ts`, add `numericValue` after `state` in `HeatmapCell` and `numericRange` after `legendStates` in `HeatmapData`:
 
@@ -222,7 +222,7 @@ return {
 
 Keep duration intensity in the first pass so `numeric_intensity: duration` is unchanged.
 
-- [ ] **Step 4: Normalize value intensity in a second pass**
+- [x] **Step 4: Normalize value intensity in a second pass**
 
 After constructing `days`, collect occupied numeric values only when the resolved mode is numeric and the configured strategy is `value`:
 
@@ -256,7 +256,7 @@ return { mode, days, totalSeconds, legendStates, numericRange };
 
 Return `numericRange` only for numeric value mode so the public result does not imply a scale in duration or categorical mode.
 
-- [ ] **Step 5: Run aggregation and full unit tests and verify GREEN**
+- [x] **Step 5: Run aggregation and full unit tests and verify GREEN**
 
 Run:
 
@@ -267,7 +267,7 @@ npm test
 
 Expected: all weighted-value, constant-range, exclusion, future, existing duration, categorical, boundary, and DST tests pass.
 
-- [ ] **Step 6: Commit aggregation**
+- [x] **Step 6: Commit aggregation**
 
 ```bash
 git add src/aggregation.ts tests/aggregation.test.ts
@@ -281,7 +281,7 @@ git commit -m "feat: scale numeric cells by weighted value"
 - Modify: `tests/editor.test.ts`
 - Modify: `src/editor.ts`
 
-- [ ] **Step 1: Write failing editor tests**
+- [x] **Step 1: Write failing editor tests**
 
 Extend the required-controls test and add conditional/event tests:
 
@@ -321,7 +321,7 @@ it("hides numeric intensity in categorical mode", async () => {
 });
 ```
 
-- [ ] **Step 2: Run the editor test and verify RED**
+- [x] **Step 2: Run the editor test and verify RED**
 
 Run:
 
@@ -331,7 +331,7 @@ npx vitest run tests/editor.test.ts
 
 Expected: FAIL because the new select does not exist.
 
-- [ ] **Step 3: Render and bind the numeric intensity control**
+- [x] **Step 3: Render and bind the numeric intensity control**
 
 Import `NumericIntensity` in `src/editor.ts`. In the `Numeric occupancy` section, place the selector before threshold and color:
 
@@ -352,7 +352,7 @@ Import `NumericIntensity` in `src/editor.ts`. In the `Numeric occupancy` section
 
 Keep the surrounding `mode !== "categorical"` condition, so automatic and numeric modes show the control while categorical mode does not.
 
-- [ ] **Step 4: Run editor and full unit tests and verify GREEN**
+- [x] **Step 4: Run editor and full unit tests and verify GREEN**
 
 Run:
 
@@ -363,7 +363,7 @@ npm test
 
 Expected: the selector renders, emits `value`, remains visible in automatic mode, and is absent in categorical mode.
 
-- [ ] **Step 5: Commit the editor**
+- [x] **Step 5: Commit the editor**
 
 ```bash
 git add src/editor.ts tests/editor.test.ts
@@ -378,7 +378,7 @@ git commit -m "feat: configure numeric color intensity"
 - Modify: `src/card.ts`
 - Modify: `src/types.ts`
 
-- [ ] **Step 1: Write a failing card detail test**
+- [x] **Step 1: Write a failing card detail test**
 
 Allow the card-test `hass` helper to accept an optional unit and add it to entity attributes. Add a value-mode test with a full hour split between `1` and `3`, then focus the first occupied cell:
 
@@ -414,7 +414,7 @@ it("shows weighted sensor value, unit, and occupied duration", async () => {
 
 Keep the existing duration-mode test without `numeric_intensity` to prove backward compatibility.
 
-- [ ] **Step 2: Run the card test and verify RED**
+- [x] **Step 2: Run the card test and verify RED**
 
 Run:
 
@@ -424,7 +424,7 @@ npx vitest run tests/card.test.ts
 
 Expected: FAIL because details do not include weighted values or units.
 
-- [ ] **Step 3: Add unit typing and localized value formatting**
+- [x] **Step 3: Add unit typing and localized value formatting**
 
 In `src/types.ts`, explicitly add this property to `HassEntity.attributes` after `friendly_name`:
 
@@ -477,7 +477,7 @@ private cellDetail(cell: HeatmapCell): string {
 
 In the selected details row, use `this.numericValueLabel(this.selected)`, then `this.selected.state`, then `summaryKind` as the `<strong>` fallback. Render `this.cellTimeDetail(this.selected)` in the adjacent `<span>`. The cell title and aria label continue using `cellDetail`, so both include the weighted value and occupied duration.
 
-- [ ] **Step 4: Run card and full unit tests and verify GREEN**
+- [x] **Step 4: Run card and full unit tests and verify GREEN**
 
 Run:
 
@@ -488,7 +488,7 @@ npm test
 
 Expected: value mode exposes localized weighted values in title, aria label, and details while duration mode remains unchanged.
 
-- [ ] **Step 5: Commit details rendering**
+- [x] **Step 5: Commit details rendering**
 
 ```bash
 git add src/card.ts src/types.ts tests/card.test.ts
@@ -505,7 +505,7 @@ git commit -m "feat: show weighted values in cell details"
 - Modify: `tests/e2e/heatmap.spec.ts`
 - Modify: `docs/images/preview-dark.png`
 
-- [ ] **Step 1: Write the failing browser assertion**
+- [x] **Step 1: Write the failing browser assertion**
 
 Configure the mock numeric card with `numeric_intensity: "value"`. In the existing theme test, click a filled numeric cell and assert the details include a numeric value and occupied minutes:
 
@@ -517,7 +517,7 @@ await expect(numericCard.locator(".details")).toContainText(/\d+(\.\d+)? people/
 await expect(numericCard.locator(".details")).toContainText(/\d+ min/);
 ```
 
-- [ ] **Step 2: Run the focused browser test and verify RED**
+- [x] **Step 2: Run the focused browser test and verify RED**
 
 Run:
 
@@ -527,7 +527,7 @@ npx playwright test tests/e2e/heatmap.spec.ts --project=desktop --grep="dark das
 
 Expected: FAIL because the demo is still configured for duration intensity and has no `people` unit.
 
-- [ ] **Step 3: Update the mock preview data**
+- [x] **Step 3: Update the mock preview data**
 
 In `demo/main.ts`, give `sensor.living_room_activity` a `unit_of_measurement: "people"` attribute and configure the numeric card with:
 
@@ -537,7 +537,7 @@ numeric_intensity: "value",
 
 Keep varied numeric states in the mock history so the screenshot visibly demonstrates global value scaling.
 
-- [ ] **Step 4: Document the complete calculation in README and changelog**
+- [x] **Step 4: Document the complete calculation in README and changelog**
 
 Replace the numeric section with separate duration and sensor-value examples. Add a `Numeric intensity calculations` subsection containing these formulas verbatim:
 
@@ -573,7 +573,7 @@ Add this row to the options table:
 
 Add an unreleased `0.2.0` changelog section describing selectable duration/value intensity, global time-weighted scaling, detail values, and calculation documentation.
 
-- [ ] **Step 5: Run browser coverage and update the tracked preview**
+- [x] **Step 5: Run browser coverage and update the tracked preview**
 
 Run:
 
@@ -584,7 +584,7 @@ npm run test:e2e
 
 Expected: both themes pass on desktop and mobile, body overflow remains absent, mobile matrix scrolling remains present, value details render, and `docs/images/preview-dark.png` is refreshed by the dark desktop test.
 
-- [ ] **Step 6: Commit docs and browser harness**
+- [x] **Step 6: Commit docs and browser harness**
 
 ```bash
 git add README.md CHANGELOG.md demo/main.ts tests/e2e/heatmap.spec.ts docs/images/preview-dark.png
@@ -601,7 +601,7 @@ git commit -m "docs: explain numeric intensity calculations"
 - Modify: `dist/ha-occupancy-heatmap-card.js.map`
 - Modify: `docs/superpowers/plans/2026-07-28-numeric-value-intensity.md`
 
-- [ ] **Step 1: Bump the package version**
+- [x] **Step 1: Bump the package version**
 
 Run:
 
@@ -611,7 +611,7 @@ npm version 0.2.0 --no-git-tag-version
 
 Expected: `package.json` and `package-lock.json` report `0.2.0` without creating a tag or commit.
 
-- [ ] **Step 2: Run full local verification and rebuild the HACS asset**
+- [x] **Step 2: Run full local verification and rebuild the HACS asset**
 
 Run:
 
