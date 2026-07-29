@@ -2,8 +2,6 @@
 
 A Home Assistant dashboard card that turns recorder history into a day-by-hour occupancy heatmap. Numeric sensors can scale one color by occupied time or sensor value; categorical sensors use stable colors for their dominant state.
 
-![Dark dashboard preview](docs/images/preview-dark.png)
-
 ## Install with HACS
 
 [![Open your Home Assistant instance and add this repository to HACS.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=wfchan&repository=ha-occupancy-heatmap-card&category=plugin)
@@ -145,7 +143,7 @@ npm run build
 npm run test:e2e
 ```
 
-Run `npm run dev` to open the mocked Home Assistant preview. Design and implementation records live in [`docs/superpowers`](docs/superpowers).
+Run `npm run dev` to open the mocked Home Assistant preview.
 
 ## Community
 

@@ -1,5 +1,6 @@
 .DS_Store
 reference_image/
+docs/
 node_modules/
 coverage/
 playwright-report/
